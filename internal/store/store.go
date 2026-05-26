@@ -2,22 +2,33 @@ package store
 
 import (
 	"context"
+	"errors"
 
 	"github.com/mergerhq/merger/internal/domain"
 	"github.com/mergerhq/merger/internal/events"
 )
 
+var ErrChangePacketNotFound = errors.New("change packet not found")
+
 type ChangePacketStore interface {
 	SaveChangePacket(context.Context, domain.ChangePacket) error
+	GetChangePacket(context.Context, string) (domain.ChangePacket, error)
+	ListChangePackets(context.Context, int) ([]domain.ChangePacket, error)
 }
 
 type EventStore interface {
 	SaveEvent(context.Context, events.Envelope) error
 }
 
+type EvidenceExecutionStore interface {
+	UpsertEvidenceExecution(context.Context, domain.EvidenceExecution) error
+	ListEvidenceExecutions(context.Context, string) ([]domain.EvidenceExecution, error)
+}
+
 type Repository interface {
 	ChangePacketStore
 	EventStore
+	EvidenceExecutionStore
 	Migrate(context.Context) error
 	Close() error
 }

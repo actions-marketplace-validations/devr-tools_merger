@@ -124,8 +124,7 @@ make verify
 ## Near-Term TODOs
 
 - Add Kafka and non-GitHub SCM providers to validate the public extension model.
-- Persist normalized evidence execution state rather than only packet/event envelopes.
-- Expose gRPC APIs from `proto/merger/v1`.
+- Expose a real gRPC transport on top of the expanded Phase 2 control-plane contract in `proto/merger/v1`.
 - Expand runtime graph ingestion from service catalogs, deployment systems, and ownership registries.
 - Add analyzer SDK examples for out-of-tree semantic detectors.
 - Introduce replay workers and outbox-based delivery guarantees.

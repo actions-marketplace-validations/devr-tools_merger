@@ -5,7 +5,9 @@ import (
 	"net/http"
 
 	"github.com/mergerhq/merger/internal/config"
+	"github.com/mergerhq/merger/internal/controlplane"
 	"github.com/mergerhq/merger/internal/events"
+	"github.com/mergerhq/merger/internal/store"
 	"github.com/mergerhq/merger/internal/telemetry"
 )
 
@@ -15,12 +17,13 @@ type App struct {
 	bus    events.Bus
 }
 
-func New(cfg config.Config, logger *telemetry.Logger, bus events.Bus) *App {
+func New(cfg config.Config, logger *telemetry.Logger, bus events.Bus, repository store.Repository) *App {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte("ok"))
 	})
+	controlplane.NewHTTPHandler(controlplane.NewService(repository)).Register(mux)
 
 	return &App{
 		logger: logger,

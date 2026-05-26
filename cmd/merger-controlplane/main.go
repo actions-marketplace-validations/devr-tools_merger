@@ -35,7 +35,7 @@ func main() {
 	}
 	defer bus.Close()
 
-	app := controlplaneapp.New(cfg, logger, bus)
+	app := controlplaneapp.New(cfg, logger, bus, repo)
 
 	log.Fatal(app.Run())
 }

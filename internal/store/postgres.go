@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -71,8 +72,11 @@ on conflict (id) do update set
 		packet.CreatedAt,
 		packet.UpdatedAt,
 	)
+	if err != nil {
+		return err
+	}
 
-	return err
+	return r.syncEvidenceRequirements(ctx, packet)
 }
 
 func (r *PostgresRepository) SaveEvent(ctx context.Context, event events.Envelope) error {
@@ -99,6 +103,125 @@ func (r *PostgresRepository) SaveEvent(ctx context.Context, event events.Envelop
 	return err
 }
 
+func (r *PostgresRepository) GetChangePacket(ctx context.Context, id string) (domain.ChangePacket, error) {
+	var payload []byte
+	if err := r.db.QueryRowContext(ctx, `select payload from merger_change_packets where id = $1`, id).Scan(&payload); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.ChangePacket{}, ErrChangePacketNotFound
+		}
+		return domain.ChangePacket{}, err
+	}
+
+	var packet domain.ChangePacket
+	if err := json.Unmarshal(payload, &packet); err != nil {
+		return domain.ChangePacket{}, err
+	}
+	return packet, nil
+}
+
+func (r *PostgresRepository) ListChangePackets(ctx context.Context, limit int) ([]domain.ChangePacket, error) {
+	if limit <= 0 {
+		limit = 50
+	}
+
+	rows, err := r.db.QueryContext(ctx, `select payload from merger_change_packets order by updated_at desc limit $1`, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	packets := make([]domain.ChangePacket, 0, limit)
+	for rows.Next() {
+		var payload []byte
+		if err := rows.Scan(&payload); err != nil {
+			return nil, err
+		}
+
+		var packet domain.ChangePacket
+		if err := json.Unmarshal(payload, &packet); err != nil {
+			return nil, err
+		}
+		packets = append(packets, packet)
+	}
+
+	return packets, rows.Err()
+}
+
+func (r *PostgresRepository) UpsertEvidenceExecution(ctx context.Context, execution domain.EvidenceExecution) error {
+	metadata, err := json.Marshal(execution.Metadata)
+	if err != nil {
+		return err
+	}
+	if execution.UpdatedAt.IsZero() {
+		execution.UpdatedAt = time.Now().UTC()
+	}
+
+	_, err = r.db.ExecContext(ctx, `
+insert into merger_evidence_executions (
+	change_packet_id, evidence_name, evidence_type, status, required, summary, details_url, updated_by, metadata, updated_at
+)
+values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+on conflict (change_packet_id, evidence_name) do update set
+	evidence_type = excluded.evidence_type,
+	status = excluded.status,
+	required = excluded.required,
+	summary = excluded.summary,
+	details_url = excluded.details_url,
+	updated_by = excluded.updated_by,
+	metadata = excluded.metadata,
+	updated_at = excluded.updated_at`,
+		execution.ChangePacketID,
+		execution.Name,
+		execution.Type,
+		execution.Status,
+		execution.Required,
+		execution.Summary,
+		execution.DetailsURL,
+		execution.UpdatedBy,
+		metadata,
+		execution.UpdatedAt,
+	)
+	return err
+}
+
+func (r *PostgresRepository) ListEvidenceExecutions(ctx context.Context, changePacketID string) ([]domain.EvidenceExecution, error) {
+	rows, err := r.db.QueryContext(ctx, `
+select change_packet_id, evidence_name, evidence_type, status, required, coalesce(summary,''), coalesce(details_url,''), coalesce(updated_by,''), metadata, updated_at
+from merger_evidence_executions
+where change_packet_id = $1
+order by evidence_name asc`, changePacketID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	executions := make([]domain.EvidenceExecution, 0)
+	for rows.Next() {
+		var execution domain.EvidenceExecution
+		var metadata []byte
+		if err := rows.Scan(
+			&execution.ChangePacketID,
+			&execution.Name,
+			&execution.Type,
+			&execution.Status,
+			&execution.Required,
+			&execution.Summary,
+			&execution.DetailsURL,
+			&execution.UpdatedBy,
+			&metadata,
+			&execution.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		if len(metadata) > 0 {
+			_ = json.Unmarshal(metadata, &execution.Metadata)
+		}
+		executions = append(executions, execution)
+	}
+
+	return executions, rows.Err()
+}
+
 func (r *PostgresRepository) Close() error {
 	if r.db == nil {
 		return nil
@@ -111,4 +234,21 @@ func (r *PostgresRepository) Ping(ctx context.Context) error {
 		return fmt.Errorf("postgres repository not initialized")
 	}
 	return r.db.PingContext(ctx)
+}
+
+func (r *PostgresRepository) syncEvidenceRequirements(ctx context.Context, packet domain.ChangePacket) error {
+	for _, requirement := range packet.Evidence {
+		if err := r.UpsertEvidenceExecution(ctx, domain.EvidenceExecution{
+			ChangePacketID: packet.ID,
+			Name:           requirement.Name,
+			Type:           requirement.Type,
+			Status:         domain.EvidencePending,
+			Required:       requirement.Required,
+			UpdatedBy:      "merger",
+			UpdatedAt:      packet.UpdatedAt,
+		}); err != nil {
+			return err
+		}
+	}
+	return nil
 }

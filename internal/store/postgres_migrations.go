@@ -27,5 +27,19 @@ func postgresMigrations() []string {
 		)`,
 		`create index if not exists idx_merger_event_log_change_packet_id on merger_event_log (change_packet_id)`,
 		`create index if not exists idx_merger_event_log_event_type on merger_event_log (event_type)`,
+		`create table if not exists merger_evidence_executions (
+			change_packet_id text not null,
+			evidence_name text not null,
+			evidence_type text not null,
+			status text not null,
+			required boolean not null,
+			summary text,
+			details_url text,
+			updated_by text,
+			metadata jsonb,
+			updated_at timestamptz not null,
+			primary key (change_packet_id, evidence_name)
+		)`,
+		`create index if not exists idx_merger_evidence_executions_change_packet_id on merger_evidence_executions (change_packet_id)`,
 	}
 }

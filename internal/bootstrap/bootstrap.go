@@ -13,7 +13,7 @@ import (
 func BuildRepository(ctx context.Context, cfg config.Config) (store.Repository, error) {
 	switch cfg.Persistence.Backend {
 	case "", "memory":
-		return store.NewNoopRepository(), nil
+		return store.NewMemoryRepository(), nil
 	case "postgres":
 		repo, err := store.NewPostgresRepository(cfg.Persistence.DatabaseURL)
 		if err != nil {
