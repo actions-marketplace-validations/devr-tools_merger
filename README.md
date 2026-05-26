@@ -99,6 +99,8 @@ policies:
 
 ## Local Development
 
+MergeR now requires Go `1.25.10` for local development and CI. That upgrade is part of the security baseline, not an optional tooling preference.
+
 Use the provided compose stack for platform dependencies:
 
 ```bash
@@ -111,6 +113,7 @@ Default services:
 
 - Ingest HTTP: `:8080`
 - Control-plane HTTP: `:8081`
+- Control-plane gRPC: `:9091`
 - PostgreSQL: `:5432`
 - Redis: `:6379`
 - NATS: `:4222`
@@ -124,8 +127,8 @@ make verify
 ## Near-Term TODOs
 
 - Add Kafka and non-GitHub SCM providers to validate the public extension model.
-- Expose a real gRPC transport on top of the expanded Phase 2 control-plane contract in `proto/merger/v1`.
 - Expand runtime graph ingestion from service catalogs, deployment systems, and ownership registries.
 - Add analyzer SDK examples for out-of-tree semantic detectors.
 - Introduce replay workers and outbox-based delivery guarantees.
 - Learn policy weights and lane thresholds from deploy outcomes and incident history.
+- Upgrade generated protobuf plugins in lockstep with future gRPC releases.
