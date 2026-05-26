@@ -8,7 +8,7 @@ TEST_PKGS := $(shell find . -type f -name '*_test.go' -not -path './.build/*' | 
 export GOCACHE := $(abspath $(BUILD_DIR)/go-cache)
 export GOMODCACHE := $(abspath $(BUILD_DIR)/go-mod-cache)
 
-.PHONY: fmt test build run-ingest run-controlplane compose-up compose-down docker-build clean
+.PHONY: fmt test test-all build verify run-ingest run-controlplane compose-up compose-down docker-build clean
 
 $(BUILD_DIR):
 	mkdir -p $(GOCACHE) $(GOMODCACHE)
@@ -20,8 +20,13 @@ test: $(BUILD_DIR)
 	@if [ -z "$(TEST_PKGS)" ]; then echo "no test packages found"; exit 1; fi
 	$(GO) test $(TEST_PKGS)
 
+test-all: $(BUILD_DIR)
+	$(GO) test ./...
+
 build: $(BUILD_DIR)
 	$(GO) build ./cmd/...
+
+verify: test-all build
 
 run-ingest: $(BUILD_DIR)
 	MERGER_CONFIG_PATH=$(CONFIG) $(GO) run ./cmd/merger-ingest

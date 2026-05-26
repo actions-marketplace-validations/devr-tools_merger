@@ -14,6 +14,7 @@ import (
 	"github.com/mergerhq/merger/internal/policy"
 	"github.com/mergerhq/merger/internal/risk"
 	"github.com/mergerhq/merger/internal/runtimegraph"
+	"github.com/mergerhq/merger/internal/store"
 	"github.com/mergerhq/merger/internal/telemetry"
 )
 
@@ -28,6 +29,7 @@ func New(
 	bus events.Bus,
 	githubService github.Service,
 	policyEngine policy.Engine,
+	repository store.Repository,
 ) *App {
 	processor := ingest.NewProcessor(
 		logger,
@@ -43,11 +45,14 @@ func New(
 			RedMax:    cfg.Lanes.RedMax,
 		}),
 		checks.NewGitHubCheckPublisher(githubService),
-		runtimegraph.NewStaticResolver(nil, nil),
+		runtimegraph.NewResolver(runtimegraph.Options{
+			EnableCodeOwners: cfg.RuntimeGraph.EnableCodeOwners,
+		}),
+		repository,
 	)
 
 	mux := http.NewServeMux()
-	mux.Handle("/webhooks/github", ingest.NewWebhookHandler(processor))
+	mux.Handle("/webhooks/github", ingest.NewWebhookHandler(processor, github.NewWebhookDecoder(cfg.GitHub.WebhookSecret)))
 	mux.HandleFunc("/healthz", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte("ok"))

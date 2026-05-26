@@ -16,6 +16,7 @@ import (
 	"github.com/mergerhq/merger/internal/policy"
 	"github.com/mergerhq/merger/internal/risk"
 	"github.com/mergerhq/merger/internal/runtimegraph"
+	"github.com/mergerhq/merger/internal/store"
 	"github.com/mergerhq/merger/internal/telemetry"
 	"github.com/mergerhq/merger/pkg/diff"
 	"github.com/mergerhq/merger/pkg/identity"
@@ -32,6 +33,7 @@ type Processor struct {
 	assigner  lanes.Assigner
 	checks    checks.Publisher
 	runtime   runtimegraph.Resolver
+	store     store.ChangePacketStore
 }
 
 func NewProcessor(
@@ -45,6 +47,7 @@ func NewProcessor(
 	assigner lanes.Assigner,
 	checkPublisher checks.Publisher,
 	runtimeResolver runtimegraph.Resolver,
+	packetStore store.ChangePacketStore,
 ) *Processor {
 	return &Processor{
 		logger:    logger,
@@ -57,12 +60,18 @@ func NewProcessor(
 		assigner:  assigner,
 		checks:    checkPublisher,
 		runtime:   runtimeResolver,
+		store:     packetStore,
 	}
 }
 
 func (p *Processor) ProcessPROpened(ctx context.Context, payload github.PullRequestWebhookPayload) (*domain.ChangePacket, error) {
 	ctx, span := p.tracer.Start(ctx, "ingest.process_pr_opened")
 	defer span.End()
+
+	githubService := p.github
+	if binder, ok := p.github.(github.InstallationBinder); ok && payload.Installation.ID != 0 {
+		githubService = binder.ForInstallation(payload.Installation.ID)
+	}
 
 	repoOwner := payload.Repository.Owner.Login
 	repoName := payload.Repository.Name
@@ -76,7 +85,7 @@ func (p *Processor) ProcessPROpened(ctx context.Context, payload github.PullRequ
 		return nil, err
 	}
 
-	pr, err := p.github.GetPullRequest(ctx, repoOwner, repoName, prNumber)
+	pr, err := githubService.GetPullRequest(ctx, repoOwner, repoName, prNumber)
 	if err != nil {
 		pr = github.PullRequest{
 			Owner:   repoOwner,
@@ -91,7 +100,7 @@ func (p *Processor) ProcessPROpened(ctx context.Context, payload github.PullRequ
 		}
 	}
 
-	rawDiff, err := p.github.GetPullRequestDiff(ctx, repoOwner, repoName, prNumber)
+	rawDiff, err := githubService.GetPullRequestDiff(ctx, repoOwner, repoName, prNumber)
 	if err != nil {
 		rawDiff = ""
 	}
@@ -132,7 +141,8 @@ func (p *Processor) ProcessPROpened(ctx context.Context, payload github.PullRequ
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
 		Metadata: map[string]string{
-			"correlation_id": telemetry.CorrelationID(ctx),
+			"correlation_id":  telemetry.CorrelationID(ctx),
+			"installation_id": fmt.Sprintf("%d", payload.Installation.ID),
 		},
 	}
 
@@ -140,7 +150,19 @@ func (p *Processor) ProcessPROpened(ctx context.Context, payload github.PullRequ
 		return nil, err
 	}
 
-	packet.Mutations, err = p.mutations.Classify(ctx, packet.Files)
+	contentLoader := githubContentLoader{
+		service: githubService,
+		owner:   repoOwner,
+		repo:    repoName,
+		ref:     packet.PR.HeadSHA,
+	}
+
+	packet.Mutations, err = p.mutations.Classify(ctx, mutations.AnalysisRequest{
+		Repo:    packet.Repo,
+		Ref:     packet.PR.HeadSHA,
+		Files:   packet.Files,
+		Content: contentLoader,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +170,11 @@ func (p *Processor) ProcessPROpened(ctx context.Context, payload github.PullRequ
 		return nil, err
 	}
 
-	packet.Runtime, packet.Ownership, err = p.runtime.ResolveImpact(ctx, packet)
+	packet.Runtime, packet.Ownership, err = p.runtime.ResolveImpact(ctx, runtimegraph.ResolutionInput{
+		Packet: packet,
+		Ref:    packet.PR.HeadSHA,
+		Loader: contentLoader,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -190,6 +216,11 @@ func (p *Processor) ProcessPROpened(ctx context.Context, payload github.PullRequ
 
 	if err := p.checks.Publish(ctx, packet); err != nil {
 		return nil, err
+	}
+	if p.store != nil {
+		if err := p.store.SaveChangePacket(ctx, packet); err != nil {
+			return nil, err
+		}
 	}
 
 	p.logger.Info("processed pull request",
@@ -237,4 +268,15 @@ func languageFromPath(path string) string {
 
 func (p *Processor) DescribeWebhook(payload github.PullRequestWebhookPayload) string {
 	return fmt.Sprintf("%s#%d action=%s", payload.Repository.FullName, payload.PullRequest.Number, payload.Action)
+}
+
+type githubContentLoader struct {
+	service github.Service
+	owner   string
+	repo    string
+	ref     string
+}
+
+func (l githubContentLoader) Load(ctx context.Context, path string) ([]byte, error) {
+	return l.service.GetFileContent(ctx, l.owner, l.repo, path, l.ref)
 }

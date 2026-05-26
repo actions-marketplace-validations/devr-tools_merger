@@ -1,9 +1,15 @@
 package github
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
 	"net/http"
+	"strings"
 )
 
 type Webhook struct {
@@ -43,21 +49,61 @@ type PullRequestWebhookPayload struct {
 	} `json:"pull_request"`
 }
 
-func DecodeWebhookRequest(r *http.Request) (Webhook, error) {
+type WebhookDecoder struct {
+	secret string
+}
+
+func NewWebhookDecoder(secret string) WebhookDecoder {
+	return WebhookDecoder{secret: secret}
+}
+
+func (d WebhookDecoder) Decode(r *http.Request) (Webhook, error) {
 	event := r.Header.Get("X-GitHub-Event")
 	if event == "" {
 		return Webhook{}, errors.New("missing GitHub event header")
 	}
 
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		return Webhook{}, err
+	}
+
+	signature := r.Header.Get("X-Hub-Signature-256")
+	if err := d.verify(body, signature); err != nil {
+		return Webhook{}, err
+	}
+
 	var payload PullRequestWebhookPayload
-	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+	if err := json.Unmarshal(body, &payload); err != nil {
 		return Webhook{}, err
 	}
 
 	return Webhook{
 		Event:        event,
 		DeliveryID:   r.Header.Get("X-GitHub-Delivery"),
-		Signature256: r.Header.Get("X-Hub-Signature-256"),
+		Signature256: signature,
 		Payload:      payload,
 	}, nil
+}
+
+func (d WebhookDecoder) verify(payload []byte, signature string) error {
+	if d.secret == "" {
+		return nil
+	}
+	if signature == "" {
+		return errors.New("missing GitHub signature header")
+	}
+	if !strings.HasPrefix(signature, "sha256=") {
+		return fmt.Errorf("unsupported GitHub signature format")
+	}
+
+	expectedMAC := hmac.New(sha256.New, []byte(d.secret))
+	expectedMAC.Write(payload)
+	expected := "sha256=" + hex.EncodeToString(expectedMAC.Sum(nil))
+
+	if !hmac.Equal([]byte(expected), []byte(signature)) {
+		return errors.New("invalid GitHub webhook signature")
+	}
+
+	return nil
 }

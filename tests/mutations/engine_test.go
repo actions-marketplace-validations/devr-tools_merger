@@ -11,13 +11,19 @@ import (
 func TestDefaultEngineClassifiesSchemaMutation(t *testing.T) {
 	engine := mutations.DefaultEngine()
 
-	results, err := engine.Classify(context.Background(), []domain.ChangedFile{
-		{
+	results, err := engine.Classify(context.Background(), mutations.AnalysisRequest{
+		Repo: domain.RepoRef{
+			Owner:    "acme",
+			Name:     "payments",
+			FullName: "acme/payments",
+		},
+		Ref: "deadbeef",
+		Files: []domain.ChangedFile{{
 			Path:     "migrations/20260525_add_users.sql",
 			Status:   domain.FileAdded,
 			Patch:    "+ALTER TABLE users ADD COLUMN timezone TEXT;",
 			Language: "sql",
-		},
+		}},
 	})
 	if err != nil {
 		t.Fatalf("classify: %v", err)

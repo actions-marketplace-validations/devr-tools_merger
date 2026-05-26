@@ -8,6 +8,12 @@ MergeR is a mutation control plane for AI-native engineering organizations. It c
 
 It is not a code review bot. The design center is operational coordination at a scale where autonomous agents can generate more software mutations than humans can inspect manually.
 
+## Open-Source Shape
+
+MergeR is being built as an open-source platform core. The repository includes first-party implementations for GitHub, NATS, and PostgreSQL, but the extension seams are public so other organizations can plug in their own SCM systems, topology sources, event backbones, analyzers, and persistence adapters.
+
+See [docs/extending-merger.md](/Users/alex/Documents/GitHub/merger/docs/extending-merger.md:1) for the current extension surface.
+
 ## Phase 1 Foundation
 
 This repository scaffolds the first production-oriented control plane slice:
@@ -28,18 +34,22 @@ This repository scaffolds the first production-oriented control plane slice:
 The repository is organized around domain boundaries instead of a single service package:
 
 - `cmd/merger-ingest`: HTTP ingress for GitHub pull request webhooks.
-- `cmd/merger-controlplane`: control-plane process placeholder for downstream orchestration and subscriptions.
+- `cmd/merger-controlplane`: control-plane process for downstream orchestration and subscriptions.
 - `internal/domain`: strongly typed core models such as `ChangePacket`, `Mutation`, `Risk`, and `PolicyDecision`.
 - `internal/ingest`: request handling and Change Packet assembly.
 - `internal/mutations`: semantic mutation engine and signal extractors.
 - `internal/risk`: weighted risk scoring and risk summary generation.
 - `internal/policy`: YAML-backed policy evaluation.
 - `internal/lanes`: merge lane assignment.
-- `internal/runtimegraph`: runtime graph contracts and Phase 1 impact resolver placeholder.
-- `internal/github`: GitHub App/webhook/check interfaces and placeholders.
-- `internal/events`: async-friendly event bus abstraction with an in-memory implementation.
+- `internal/runtimegraph`: runtime graph contracts and pluggable topology sources.
+- `internal/github`: GitHub App auth, webhook verification, PR/diff fetch, file content fetch, and check publishing.
+- `internal/events`: async-friendly event bus abstraction with memory and NATS JetStream implementations.
+- `internal/store`: PostgreSQL-backed persistence for Change Packets and emitted events.
+- `internal/bootstrap`: provider construction for first-party adapters.
 - `internal/telemetry`: structured logging, correlation IDs, and trace-ready interfaces.
 - `pkg/diff`: unified diff parsing reusable across services.
+- `pkg/merger`: public aliases for core MergeR types.
+- `pkg/extensions`: public provider interfaces for open-source extension.
 - `tests/`: black-box and package-level tests kept separate from source packages.
 
 ## Merge Lane Model
@@ -53,14 +63,15 @@ The repository is organized around domain boundaries instead of a single service
 
 1. GitHub sends a `pull_request` webhook.
 2. The ingest service creates a correlation-aware processing context.
-3. Pull request metadata and diff are fetched through the GitHub adapter.
+3. Pull request metadata, diff, and file content are fetched through the GitHub App adapter.
 4. The diff parser produces normalized changed files.
-5. The mutation engine classifies semantic mutations from path rules and patch-derived signals.
-6. The runtime graph resolver estimates blast radius and ownership boundaries.
+5. The mutation engine combines path rules, patch signals, and AST/structured analyzers.
+6. Runtime graph sources ingest topology hints such as deploy manifests and `CODEOWNERS`.
 7. The risk engine computes risks and an aggregate risk score.
 8. The policy engine resolves reviewers, evidence, deployment constraints, and blockers.
 9. The lane assigner selects `GREEN`, `YELLOW`, `RED`, or `BLACK`.
-10. A GitHub Check Run summary is published and internal events are emitted for downstream consumers.
+10. Change Packets and event envelopes are persisted in PostgreSQL.
+11. A GitHub Check Run summary is published and internal events are emitted through NATS JetStream.
 
 See [docs/flows/github-webhook-flow.md](/Users/alex/Documents/GitHub/merger/docs/flows/github-webhook-flow.md:1) for the detailed flow and [docs/examples/change-packet.json](/Users/alex/Documents/GitHub/merger/docs/examples/change-packet.json:1) for a sample Change Packet.
 
@@ -104,12 +115,18 @@ Default services:
 - Redis: `:6379`
 - NATS: `:4222`
 
+Suggested verification:
+
+```bash
+make verify
+```
+
 ## Near-Term TODOs
 
-- Replace the in-memory event bus with NATS and Kafka adapters.
-- Add real GitHub App auth, signature verification, and API clients.
-- Add AST-backed Go analyzers that pull repository file contents instead of diff-only heuristics.
-- Persist Change Packets, events, and evidence state in PostgreSQL.
+- Add Kafka and non-GitHub SCM providers to validate the public extension model.
+- Persist normalized evidence execution state rather than only packet/event envelopes.
 - Expose gRPC APIs from `proto/merger/v1`.
-- Expand runtime graph ingestion from service catalogs, deploy manifests, and ownership metadata.
+- Expand runtime graph ingestion from service catalogs, deployment systems, and ownership registries.
+- Add analyzer SDK examples for out-of-tree semantic detectors.
+- Introduce replay workers and outbox-based delivery guarantees.
 - Learn policy weights and lane thresholds from deploy outcomes and incident history.

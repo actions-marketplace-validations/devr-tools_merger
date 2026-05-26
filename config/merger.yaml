@@ -6,14 +6,25 @@ logging:
   level: info
 
 github:
+  enabled: false
   webhook_secret: "replace-me"
   app_id: "replace-me"
   installation_id: 0
   private_key_path: "./secrets/github-app.pem"
+  api_base_url: "https://api.github.com"
+  timeout: "10s"
 
 events:
-  backend: memory
+  backend: nats
   subject_prefix: merger
+  nats_url: "nats://127.0.0.1:4222"
+  stream_name: "MERGER_EVENTS"
+  durable_prefix: "merger"
+
+persistence:
+  backend: postgres
+  database_url: "postgres://merger:merger@127.0.0.1:5432/merger?sslmode=disable"
+  auto_migrate: true
 
 policy:
   path: config/policies/default.yaml
@@ -26,3 +37,6 @@ lanes:
 telemetry:
   service_name: merger
   environment: dev
+
+runtime_graph:
+  enable_codeowners: true

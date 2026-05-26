@@ -3,6 +3,7 @@ package checks
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/mergerhq/merger/internal/domain"
 	"github.com/mergerhq/merger/internal/github"
@@ -25,6 +26,16 @@ func (p *GitHubCheckPublisher) Publish(ctx context.Context, packet domain.Change
 		return nil
 	}
 
+	client := p.client
+	if binder, ok := p.client.(github.InstallationBinder); ok {
+		if rawInstallationID := packet.Metadata["installation_id"]; rawInstallationID != "" {
+			installationID, err := strconv.ParseInt(rawInstallationID, 10, 64)
+			if err == nil {
+				client = binder.ForInstallation(installationID)
+			}
+		}
+	}
+
 	status := "completed"
 	conclusion := "neutral"
 	switch packet.MergeLane {
@@ -36,7 +47,7 @@ func (p *GitHubCheckPublisher) Publish(ctx context.Context, packet domain.Change
 		conclusion = "neutral"
 	}
 
-	return p.client.PublishCheckRun(ctx, github.CheckRunInput{
+	return client.PublishCheckRun(ctx, github.CheckRunInput{
 		RepoOwner:  packet.Repo.Owner,
 		RepoName:   packet.Repo.Name,
 		HeadSHA:    packet.PR.HeadSHA,

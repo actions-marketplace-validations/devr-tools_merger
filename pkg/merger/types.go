@@ -1,0 +1,41 @@
+package merger
+
+import (
+	"github.com/mergerhq/merger/internal/domain"
+	"github.com/mergerhq/merger/internal/events"
+	"github.com/mergerhq/merger/internal/runtimegraph"
+)
+
+type Author = domain.Author
+type ChangedFile = domain.ChangedFile
+type ChangePacket = domain.ChangePacket
+type RepoRef = domain.RepoRef
+type PullRequestRef = domain.PullRequestRef
+type Mutation = domain.Mutation
+type MutationKind = domain.MutationKind
+type MutationSignal = domain.MutationSignal
+type Risk = domain.Risk
+type RiskSummary = domain.RiskSummary
+type EvidenceRequirement = domain.EvidenceRequirement
+type MergeLane = domain.MergeLane
+type RuntimeImpact = domain.RuntimeImpact
+type OwnershipBoundary = domain.OwnershipBoundary
+type PolicyDecision = domain.PolicyDecision
+type ReviewerRequirement = domain.ReviewerRequirement
+type DeploymentRequirement = domain.DeploymentRequirement
+type Severity = domain.Severity
+type Criticality = domain.Criticality
+type SystemRef = domain.SystemRef
+type Envelope = events.Envelope
+type EventType = events.EventType
+type GraphNode = runtimegraph.Node
+type GraphEdge = runtimegraph.Edge
+
+const (
+	EventPROpened                = events.EventPROpened
+	EventChangePacketCreated     = events.EventChangePacketCreated
+	EventMutationDetected        = events.EventMutationDetected
+	EventRiskAssigned            = events.EventRiskAssigned
+	EventMergeLaneAssigned       = events.EventMergeLaneAssigned
+	EventPolicyViolationDetected = events.EventPolicyViolationDetected
+)

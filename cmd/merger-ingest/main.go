@@ -1,13 +1,13 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 
 	ingestapp "github.com/mergerhq/merger/internal/app/ingest"
+	"github.com/mergerhq/merger/internal/bootstrap"
 	"github.com/mergerhq/merger/internal/config"
-	"github.com/mergerhq/merger/internal/events"
-	"github.com/mergerhq/merger/internal/github"
 	"github.com/mergerhq/merger/internal/policy"
 	"github.com/mergerhq/merger/internal/telemetry"
 )
@@ -29,14 +29,31 @@ func main() {
 	}
 
 	logger := telemetry.NewLogger(cfg.Logging.Level)
-	bus := events.NewMemoryBus()
+	repo, err := bootstrap.BuildRepository(context.Background(), cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer repo.Close()
+
+	bus, err := bootstrap.BuildEventBus(cfg, repo)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer bus.Close()
+
+	githubService, err := bootstrap.BuildGitHubService(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	app := ingestapp.New(
 		cfg,
 		logger,
 		telemetry.NewTracer(),
 		bus,
-		github.NoopService{},
+		githubService,
 		policy.NewRuleEngine(policyConfig),
+		repo,
 	)
 
 	log.Fatal(app.Run())

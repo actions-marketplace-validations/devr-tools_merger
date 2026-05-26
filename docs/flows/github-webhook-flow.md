@@ -17,9 +17,9 @@
    - matches semantic mutation rules
    - emits `MutationDetected`
 9. The runtime graph resolver estimates:
-   - services and ownership touched
-   - blast radius
-   - criticality placeholder
+    - services and ownership touched
+    - blast radius
+    - criticality from available topology sources
 10. The risk engine computes:
     - risk entries
     - aggregate risk score
@@ -36,7 +36,7 @@
 
 ## Future Expansion Points
 
-- Replace in-memory eventing with NATS/Kafka.
+- Add Kafka and alternative SCM providers through the public extension interfaces.
 - Fan out Change Packet processing across specialized services.
-- Persist packet state and evidence state transitions.
+- Persist evidence execution state transitions alongside packet and event history.
 - Feed deployment outcomes back into risk and policy calibration.

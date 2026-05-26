@@ -19,9 +19,13 @@ services:
 
   nats:
     image: nats:2.10
+    command: ["-js", "--store_dir", "/data"]
     ports:
       - "4222:4222"
       - "8222:8222"
+    volumes:
+      - nats-data:/data
 
 volumes:
   postgres-data:
+  nats-data:
