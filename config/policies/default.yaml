@@ -1,0 +1,68 @@
+policies:
+  - name: auth_requires_security_review
+    description: Authentication and authorization mutations require security evidence and controlled rollout.
+    when:
+      mutations:
+        - auth_behavior_change
+    require:
+      reviewers:
+        - security
+      evidence:
+        - auth_integration_tests
+        - security_review
+      deployment:
+        strategy: canary
+        requires_canary: true
+        requires_rollback_plan: true
+        environments:
+          - staging
+          - production
+    action:
+      minimum_lane: RED
+
+  - name: schema_requires_migration_controls
+    description: Schema mutations must prove forward and rollback safety.
+    when:
+      mutations:
+        - database_schema_mutation
+    require:
+      reviewers:
+        - data-platform
+      evidence:
+        - migration_plan
+        - rollback_plan
+        - integration_tests
+      deployment:
+        strategy: phased
+        requires_canary: true
+        requires_rollback_plan: true
+        environments:
+          - staging
+          - production
+    action:
+      minimum_lane: RED
+
+  - name: api_contract_requires_contract_evidence
+    description: API contract changes require consumer safety validation.
+    when:
+      mutations:
+        - api_contract_mutation
+    require:
+      reviewers:
+        - api-owners
+      evidence:
+        - contract_tests
+        - integration_tests
+    action:
+      minimum_lane: YELLOW
+
+  - name: high_risk_changes_block_auto_merge
+    description: High aggregate risk disables autonomous propagation.
+    when:
+      risk_score_gte: 85
+    require:
+      reviewers:
+        - platform-owners
+    action:
+      minimum_lane: BLACK
+      block: true

@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package merger.v1;
+
+option go_package = "github.com/mergerhq/merger/proto/merger/v1;mergerv1";
+
+message ChangePacketRef {
+  string id = 1;
+}
+
+message GetChangePacketRequest {
+  ChangePacketRef ref = 1;
+}
+
+message GetChangePacketResponse {
+  string id = 1;
+  string merge_lane = 2;
+  int32 risk_score = 3;
+}
+
+service ChangeControlService {
+  rpc GetChangePacket(GetChangePacketRequest) returns (GetChangePacketResponse);
+}

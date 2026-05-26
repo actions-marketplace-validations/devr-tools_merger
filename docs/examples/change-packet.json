@@ -1,0 +1,149 @@
+{
+  "id": "cp_1716652800000000000_5dfd8a13b94d72fa",
+  "repo": {
+    "owner": "acme",
+    "name": "payments",
+    "fullName": "acme/payments",
+    "defaultBranch": "main"
+  },
+  "pullRequest": {
+    "number": 4821,
+    "url": "https://github.com/acme/payments/pull/4821",
+    "headSha": "5c8ae2cb10f8a2a0f76b21c5081f3ef74f8e2d11",
+    "baseSha": "b649d4e9ff17cb6128606a298dc2049af51fb1d0"
+  },
+  "author": {
+    "login": "merge-bot",
+    "type": "Bot"
+  },
+  "title": "Rotate JWT verification path and rollout claim validation",
+  "summary": "Updates JWT verification and introduces stricter issuer validation.",
+  "source": "github.pull_request",
+  "files": [
+    {
+      "path": "internal/auth/jwt.go",
+      "language": "go",
+      "status": "modified",
+      "additions": 24,
+      "deletions": 8,
+      "changes": 32
+    }
+  ],
+  "mutations": [
+    {
+      "id": "mut_1716652800000000000_24e14f66bcde9f01",
+      "kind": "auth_behavior_change",
+      "severity": "high",
+      "confidence": 0.85,
+      "title": "authentication or authorization behavior change",
+      "files": [
+        "internal/auth/jwt.go"
+      ],
+      "signals": [
+        {
+          "source": "go_patch",
+          "value": "go:auth_symbol",
+          "weight": 2
+        }
+      ],
+      "detector": "auth-surface"
+    }
+  ],
+  "risks": [
+    {
+      "type": "security",
+      "score": 35,
+      "severity": "high",
+      "summary": "security control surface changed",
+      "reason": "; mutation=auth_behavior_change",
+      "affectedSystems": [
+        "internal/auth/jwt.go"
+      ],
+      "mitigations": [
+        "security review",
+        "auth integration tests"
+      ]
+    }
+  ],
+  "riskSummary": {
+    "score": 35,
+    "severity": "medium",
+    "contributors": [
+      "security"
+    ]
+  },
+  "evidence": [
+    {
+      "type": "auth_integration_tests",
+      "name": "auth_integration_tests",
+      "required": true,
+      "reason": "required by policy auth_requires_security_review",
+      "producer": "policy-engine"
+    },
+    {
+      "type": "security_review",
+      "name": "security_review",
+      "required": true,
+      "reason": "required by policy auth_requires_security_review",
+      "producer": "policy-engine"
+    }
+  ],
+  "runtimeImpact": {
+    "blastRadius": "isolated",
+    "criticality": "normal",
+    "services": [
+      {
+        "kind": "service",
+        "name": "auth",
+        "owner": "auth",
+        "criticality": "normal"
+      }
+    ],
+    "notes": [
+      "Runtime graph resolver is scaffolded for Phase 1 and currently derives impact from repository topology."
+    ]
+  },
+  "ownership": [
+    {
+      "domain": "auth",
+      "team": "auth",
+      "systems": [
+        "auth"
+      ],
+      "critical": false
+    }
+  ],
+  "reviewers": [
+    {
+      "team": "security",
+      "reason": "required by policy auth_requires_security_review",
+      "mandatory": true
+    }
+  ],
+  "deployment": {
+    "strategy": "canary",
+    "environments": [
+      "staging",
+      "production"
+    ],
+    "requiresCanary": true,
+    "requiresRollbackPlan": true
+  },
+  "mergeLane": "RED",
+  "decision": {
+    "status": "pending",
+    "summary": "Authentication and authorization mutations require security evidence and controlled rollout.",
+    "reasons": [
+      "Authentication and authorization mutations require security evidence and controlled rollout."
+    ],
+    "appliedPolicies": [
+      "auth_requires_security_review"
+    ],
+    "minimumLane": "RED"
+  },
+  "metadata": {
+    "correlation_id": "example-delivery-id"
+  },
+  "createdAt": "2026-05-25T12:00:00Z",
+  "updatedAt": "2026-05-25T12:00:03Z"
+}

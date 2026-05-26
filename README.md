@@ -1,1 +1,115 @@
-# merger
+<p align="center">
+  <img src="img/mergrlogo.png" alt="MergeR logo" width="320">
+</p>
+
+# MergeR
+
+MergeR is a mutation control plane for AI-native engineering organizations. It converts pull requests into structured Change Packets, classifies semantic mutations, estimates blast radius and rollout risk, applies policy, and assigns a merge lane that reflects how changes should safely propagate.
+
+It is not a code review bot. The design center is operational coordination at a scale where autonomous agents can generate more software mutations than humans can inspect manually.
+
+## Phase 1 Foundation
+
+This repository scaffolds the first production-oriented control plane slice:
+
+- GitHub webhook ingest
+- PR diff parsing
+- Change Packet generation
+- Rule-based semantic mutation detection
+- Risk scoring
+- Merge lane assignment
+- YAML-backed policy evaluation
+- GitHub Check Run publishing abstraction
+- Internal event bus abstraction
+- Structured logging and trace-ready instrumentation
+
+## Architecture
+
+The repository is organized around domain boundaries instead of a single service package:
+
+- `cmd/merger-ingest`: HTTP ingress for GitHub pull request webhooks.
+- `cmd/merger-controlplane`: control-plane process placeholder for downstream orchestration and subscriptions.
+- `internal/domain`: strongly typed core models such as `ChangePacket`, `Mutation`, `Risk`, and `PolicyDecision`.
+- `internal/ingest`: request handling and Change Packet assembly.
+- `internal/mutations`: semantic mutation engine and signal extractors.
+- `internal/risk`: weighted risk scoring and risk summary generation.
+- `internal/policy`: YAML-backed policy evaluation.
+- `internal/lanes`: merge lane assignment.
+- `internal/runtimegraph`: runtime graph contracts and Phase 1 impact resolver placeholder.
+- `internal/github`: GitHub App/webhook/check interfaces and placeholders.
+- `internal/events`: async-friendly event bus abstraction with an in-memory implementation.
+- `internal/telemetry`: structured logging, correlation IDs, and trace-ready interfaces.
+- `pkg/diff`: unified diff parsing reusable across services.
+- `tests/`: black-box and package-level tests kept separate from source packages.
+
+## Merge Lane Model
+
+- `GREEN`: isolated, low-risk mutation with automated evidence and no mandatory human escalation.
+- `YELLOW`: standard review path.
+- `RED`: high-risk or owner/security-gated change.
+- `BLACK`: blocked; decomposition, rework, or policy exception required.
+
+## Change Packet Flow
+
+1. GitHub sends a `pull_request` webhook.
+2. The ingest service creates a correlation-aware processing context.
+3. Pull request metadata and diff are fetched through the GitHub adapter.
+4. The diff parser produces normalized changed files.
+5. The mutation engine classifies semantic mutations from path rules and patch-derived signals.
+6. The runtime graph resolver estimates blast radius and ownership boundaries.
+7. The risk engine computes risks and an aggregate risk score.
+8. The policy engine resolves reviewers, evidence, deployment constraints, and blockers.
+9. The lane assigner selects `GREEN`, `YELLOW`, `RED`, or `BLACK`.
+10. A GitHub Check Run summary is published and internal events are emitted for downstream consumers.
+
+See [docs/flows/github-webhook-flow.md](/Users/alex/Documents/GitHub/merger/docs/flows/github-webhook-flow.md:1) for the detailed flow and [docs/examples/change-packet.json](/Users/alex/Documents/GitHub/merger/docs/examples/change-packet.json:1) for a sample Change Packet.
+
+## Policy Example
+
+Policies are YAML and intentionally composable:
+
+```yaml
+policies:
+  - name: auth_requires_security_review
+    when:
+      mutations:
+        - auth_behavior_change
+    require:
+      reviewers:
+        - security
+      evidence:
+        - auth_integration_tests
+      deployment:
+        strategy: canary
+        requires_canary: true
+    action:
+      minimum_lane: RED
+```
+
+## Local Development
+
+Use the provided compose stack for platform dependencies:
+
+```bash
+make compose-up
+make run-ingest
+make run-controlplane
+```
+
+Default services:
+
+- Ingest HTTP: `:8080`
+- Control-plane HTTP: `:8081`
+- PostgreSQL: `:5432`
+- Redis: `:6379`
+- NATS: `:4222`
+
+## Near-Term TODOs
+
+- Replace the in-memory event bus with NATS and Kafka adapters.
+- Add real GitHub App auth, signature verification, and API clients.
+- Add AST-backed Go analyzers that pull repository file contents instead of diff-only heuristics.
+- Persist Change Packets, events, and evidence state in PostgreSQL.
+- Expose gRPC APIs from `proto/merger/v1`.
+- Expand runtime graph ingestion from service catalogs, deploy manifests, and ownership metadata.
+- Learn policy weights and lane thresholds from deploy outcomes and incident history.

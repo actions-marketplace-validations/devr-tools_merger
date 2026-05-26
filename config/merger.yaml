@@ -1,0 +1,28 @@
+service:
+  ingest_address: ":8080"
+  controlplane_address: ":8081"
+
+logging:
+  level: info
+
+github:
+  webhook_secret: "replace-me"
+  app_id: "replace-me"
+  installation_id: 0
+  private_key_path: "./secrets/github-app.pem"
+
+events:
+  backend: memory
+  subject_prefix: merger
+
+policy:
+  path: config/policies/default.yaml
+
+lanes:
+  green_max: 20
+  yellow_max: 55
+  red_max: 85
+
+telemetry:
+  service_name: merger
+  environment: dev
