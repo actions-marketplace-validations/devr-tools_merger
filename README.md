@@ -2,15 +2,15 @@
   <img src="img/mergrlogo.png" alt="MergeR logo" width="320">
 </p>
 
-# MergeR
+# Merger
 
-MergeR is a mutation control plane for AI-native engineering organizations. It converts pull requests into structured Change Packets, classifies semantic mutations, estimates blast radius and rollout risk, applies policy, and assigns a merge lane that reflects how changes should safely propagate.
+Merger is a mutation control plane for AI-native engineering organizations. It converts pull requests into structured Change Packets, classifies semantic mutations, estimates blast radius and rollout risk, applies policy, and assigns a merge lane that reflects how changes should safely propagate.
 
 It is not a code review bot. The design center is operational coordination at a scale where autonomous agents can generate more software mutations than humans can inspect manually.
 
 ## Open-Source Shape
 
-MergeR is being built as an open-source platform core. The repository includes first-party implementations for GitHub, NATS, and PostgreSQL, but the extension seams are public so other organizations can plug in their own SCM systems, topology sources, event backbones, analyzers, and persistence adapters.
+Merger is being built as an open-source platform core. The repository includes first-party implementations for GitHub, NATS, and PostgreSQL, but the extension seams are public so other organizations can plug in their own SCM systems, topology sources, event backbones, analyzers, and persistence adapters.
 
 See [docs/extending-merger.md](/Users/alex/Documents/GitHub/merger/docs/extending-merger.md:1) for the current extension surface.
 
@@ -65,14 +65,14 @@ The repository is organized around domain boundaries instead of a single service
 flowchart LR
     gh[GitHub pull_request webhook]
 
-    subgraph ingest[MergeR ingest]
+    subgraph ingest[Merger ingest]
         verify[Webhook verification and correlation context]
         fetch[Fetch PR metadata, diff, and file content]
         parse[Normalize changed files with pkg/diff]
         packet[Create Change Packet]
     end
 
-    subgraph analysis[MergeR analysis]
+    subgraph analysis[Merger analysis]
         mutations[Detect semantic mutations]
         topology[Resolve runtime graph and blast radius]
         risk[Compute risk score]
@@ -80,7 +80,7 @@ flowchart LR
         lane[Assign merge lane<br/>GREEN / YELLOW / RED / BLACK]
     end
 
-    subgraph outputs[MergeR outputs]
+    subgraph outputs[Merger outputs]
         store[Persist Change Packets and events]
         checks[Publish GitHub Check Run summary]
         bus[Emit internal events via NATS JetStream]
@@ -131,7 +131,7 @@ policies:
 
 ## Local Development
 
-MergeR now requires Go `1.25.10` for local development and CI. That upgrade is part of the security baseline, not an optional tooling preference.
+Merger now requires Go `1.25.10` for local development and CI. That upgrade is part of the security baseline, not an optional tooling preference.
 
 Bootstrap the expected toolchain into your shell before running repo commands:
 
