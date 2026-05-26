@@ -1,7 +1,0 @@
-./contracts.go
-./criticality.go
-./model.go
-./resolver.go
-./source_codeowners.go
-./source_manifest.go
-./source_repository_topology.go
