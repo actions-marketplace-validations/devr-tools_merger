@@ -61,6 +61,38 @@ The repository is organized around domain boundaries instead of a single service
 
 ## Change Packet Flow
 
+```mermaid
+flowchart LR
+    gh[GitHub pull_request webhook]
+
+    subgraph ingest[MergeR ingest]
+        verify[Webhook verification and correlation context]
+        fetch[Fetch PR metadata, diff, and file content]
+        parse[Normalize changed files with pkg/diff]
+        packet[Create Change Packet]
+    end
+
+    subgraph analysis[MergeR analysis]
+        mutations[Detect semantic mutations]
+        topology[Resolve runtime graph and blast radius]
+        risk[Compute risk score]
+        policy[Evaluate policy requirements]
+        lane[Assign merge lane<br/>GREEN / YELLOW / RED / BLACK]
+    end
+
+    subgraph outputs[MergeR outputs]
+        store[Persist Change Packets and events]
+        checks[Publish GitHub Check Run summary]
+        bus[Emit internal events via NATS JetStream]
+    end
+
+    gh --> verify --> fetch --> parse --> packet
+    packet --> mutations --> topology --> risk --> policy --> lane
+    lane --> store
+    lane --> checks
+    lane --> bus
+```
+
 1. GitHub sends a `pull_request` webhook.
 2. The ingest service creates a correlation-aware processing context.
 3. Pull request metadata, diff, and file content are fetched through the GitHub App adapter.
