@@ -1,0 +1,126 @@
+package ingest_test
+
+import (
+	"context"
+	"testing"
+
+	"github.com/mergerhq/merger/internal/domain"
+	"github.com/mergerhq/merger/internal/events"
+	"github.com/mergerhq/merger/internal/github"
+	"github.com/mergerhq/merger/internal/ingest"
+	"github.com/mergerhq/merger/internal/lanes"
+	"github.com/mergerhq/merger/internal/mutations"
+	"github.com/mergerhq/merger/internal/policy"
+	"github.com/mergerhq/merger/internal/risk"
+	"github.com/mergerhq/merger/internal/runtimegraph"
+	"github.com/mergerhq/merger/internal/telemetry"
+)
+
+func TestProcessPROpenedBuildsChangePacket(t *testing.T) {
+	processor := ingest.NewProcessor(
+		telemetry.NewLogger("error"),
+		telemetry.NewTracer(),
+		events.NewMemoryBus(),
+		stubGitHubService{},
+		mutations.DefaultEngine(),
+		risk.DefaultEngine(),
+		policy.NewRuleEngine(policy.Config{}),
+		lanes.NewAssigner(lanes.Config{GreenMax: 20, YellowMax: 55, RedMax: 85}),
+		stubCheckPublisher{},
+		runtimegraph.NewResolver(runtimegraph.Options{}),
+		nil,
+	)
+
+	packet, err := processor.ProcessPROpened(context.Background(), github.PullRequestWebhookPayload{
+		Action: "opened",
+		Repository: struct {
+			Name     string `json:"name"`
+			FullName string `json:"full_name"`
+			Owner    struct {
+				Login string `json:"login"`
+			} `json:"owner"`
+		}{
+			Name:     "repo",
+			FullName: "acme/repo",
+			Owner: struct {
+				Login string `json:"login"`
+			}{Login: "acme"},
+		},
+		PullRequest: struct {
+			Number  int    `json:"number"`
+			Title   string `json:"title"`
+			Body    string `json:"body"`
+			HTMLURL string `json:"html_url"`
+			Head    struct {
+				SHA string `json:"sha"`
+			} `json:"head"`
+			Base struct {
+				SHA string `json:"sha"`
+			} `json:"base"`
+			User struct {
+				Login string `json:"login"`
+				Type  string `json:"type"`
+			} `json:"user"`
+		}{
+			Number:  42,
+			Title:   "add endpoint",
+			Body:    "body",
+			HTMLURL: "https://example.com/pr/42",
+			Head: struct {
+				SHA string `json:"sha"`
+			}{SHA: "headsha"},
+			Base: struct {
+				SHA string `json:"sha"`
+			}{SHA: "basesha"},
+			User: struct {
+				Login string `json:"login"`
+				Type  string `json:"type"`
+			}{Login: "bot", Type: "Bot"},
+		},
+	})
+	if err != nil {
+		t.Fatalf("process PR opened: %v", err)
+	}
+	if packet.Repo.FullName != "acme/repo" {
+		t.Fatalf("expected repo full name, got %s", packet.Repo.FullName)
+	}
+	if packet.PR.Number != 42 {
+		t.Fatalf("expected PR number 42, got %d", packet.PR.Number)
+	}
+	if len(packet.Mutations) == 0 {
+		t.Fatal("expected mutations to be detected")
+	}
+}
+
+type stubGitHubService struct{}
+
+func (stubGitHubService) GetPullRequest(_ context.Context, owner, repo string, number int) (github.PullRequest, error) {
+	return github.PullRequest{
+		Owner:   owner,
+		Repo:    repo,
+		Number:  number,
+		Title:   "add endpoint",
+		Body:    "body",
+		Author:  "bot",
+		URL:     "https://example.com/pr/42",
+		HeadSHA: "headsha",
+		BaseSHA: "basesha",
+	}, nil
+}
+
+func (stubGitHubService) GetPullRequestDiff(_ context.Context, _, _ string, _ int) (string, error) {
+	return "diff --git a/internal/auth/jwt.go b/internal/auth/jwt.go\n--- a/internal/auth/jwt.go\n+++ b/internal/auth/jwt.go\n+func Authorize() {}\n", nil
+}
+
+func (stubGitHubService) GetFileContent(_ context.Context, _, _, path, _ string) ([]byte, error) {
+	if path == "internal/auth/jwt.go" {
+		return []byte("package auth\nfunc Authorize() {}\n"), nil
+	}
+	return nil, nil
+}
+
+func (stubGitHubService) PublishCheckRun(context.Context, github.CheckRunInput) error { return nil }
+
+type stubCheckPublisher struct{}
+
+func (stubCheckPublisher) Publish(context.Context, domain.ChangePacket) error { return nil }
