@@ -20,10 +20,10 @@ $(BUILD_DIR):
 	mkdir -p $(GOCACHE)
 
 fmt: $(BUILD_DIR)
-	@if [ -n "$(GO_FILES)" ]; then gofmt -w $(GO_FILES); fi
+	@if [ -n "$(GO_FILES)" ]; then "$$($(GO) env GOROOT)/bin/gofmt" -w $(GO_FILES); fi
 
 fmt-check: $(BUILD_DIR)
-	@unformatted="$$(gofmt -l $(GO_FILES))"; \
+	@unformatted="$$("$$($(GO) env GOROOT)/bin/gofmt" -l $(GO_FILES))"; \
 	if [ -n "$$unformatted" ]; then \
 		echo "$$unformatted"; \
 		exit 1; \
@@ -50,7 +50,7 @@ gocyclo: $(BUILD_DIR)
 
 coverage: $(BUILD_DIR)
 	$(GO) test $(TEST_TREE) -coverpkg=./internal/... -coverprofile=$(BUILD_DIR)/coverage.internal.out
-	@total="$$(go tool cover -func=$(BUILD_DIR)/coverage.internal.out | awk '/^total:/ {gsub(/%/, "", $$3); print $$3}')"; \
+	@total="$$($(GO) tool cover -func=$(BUILD_DIR)/coverage.internal.out | awk '/^total:/ {gsub(/%/, "", $$3); print $$3}')"; \
 	echo "Total internal coverage: $${total}%"; \
 	awk -v total="$$total" -v min="$(MIN_INTERNAL_COVERAGE)" 'BEGIN { exit !(total + 0 >= min + 0) }'
 
@@ -66,7 +66,7 @@ benchmark: $(BUILD_DIR)
 
 security: $(BUILD_DIR)
 	$(GO) install golang.org/x/vuln/cmd/govulncheck@$(GOVULNCHECK_VERSION)
-	"$$(go env GOPATH)/bin/govulncheck" $(GO_PACKAGES)
+	"$$($(GO) env GOPATH)/bin/govulncheck" $(GO_PACKAGES)
 
 proto: $(BUILD_DIR)
 	PATH="$$PATH:$$($(GO) env GOPATH)/bin" protoc --proto_path=. --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative proto/merger/v1/controlplane.proto

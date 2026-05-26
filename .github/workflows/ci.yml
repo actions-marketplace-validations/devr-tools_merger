@@ -50,7 +50,7 @@ jobs:
 
       - uses: actions/setup-go@v6
         with:
-          go-version-file: go.mod
+          go-version: ${{ env.GO_VERSION }}
           cache: true
           cache-dependency-path: go.sum
 
@@ -71,7 +71,7 @@ jobs:
 
       - uses: actions/setup-go@v6
         with:
-          go-version-file: go.mod
+          go-version: ${{ env.GO_VERSION }}
           cache: true
           cache-dependency-path: go.sum
 
@@ -87,7 +87,7 @@ jobs:
 
       - uses: actions/setup-go@v6
         with:
-          go-version-file: go.mod
+          go-version: ${{ env.GO_VERSION }}
           cache: true
           cache-dependency-path: go.sum
 
@@ -139,7 +139,7 @@ jobs:
 
       - uses: actions/setup-go@v6
         with:
-          go-version-file: go.mod
+          go-version: ${{ env.GO_VERSION }}
           cache: true
           cache-dependency-path: go.sum
 
@@ -158,7 +158,7 @@ jobs:
 
       - uses: actions/setup-go@v6
         with:
-          go-version-file: go.mod
+          go-version: ${{ env.GO_VERSION }}
           cache: true
           cache-dependency-path: go.sum
 
@@ -167,7 +167,7 @@ jobs:
         run: |
           set -euo pipefail
           make coverage
-          total="$(go tool cover -func=.coverage.internal.out | awk '/^total:/ {gsub(/%/, "", $3); print $3}')"
+          total="$(go tool cover -func=.build/coverage.internal.out | awk '/^total:/ {gsub(/%/, "", $3); print $3}')"
           {
             echo "## Coverage"
             echo
@@ -186,7 +186,7 @@ jobs:
 
       - uses: actions/setup-go@v6
         with:
-          go-version-file: go.mod
+          go-version: ${{ env.GO_VERSION }}
           cache: true
           cache-dependency-path: go.sum
 
@@ -208,7 +208,7 @@ jobs:
 
       - uses: actions/setup-go@v6
         with:
-          go-version-file: go.mod
+          go-version: ${{ env.GO_VERSION }}
           cache: true
           cache-dependency-path: go.sum
 
@@ -334,7 +334,7 @@ jobs:
 
       - uses: actions/setup-go@v6
         with:
-          go-version-file: go.mod
+          go-version: ${{ env.GO_VERSION }}
           cache: true
           cache-dependency-path: go.sum
 
