@@ -3,8 +3,8 @@ package ingest
 import (
 	"context"
 
-	"github.com/mergerhq/merger/internal/domain"
-	"github.com/mergerhq/merger/internal/events"
+	"github.com/devr-tools/merger/internal/domain"
+	"github.com/devr-tools/merger/internal/events"
 )
 
 func (p *Processor) publishPROpened(ctx context.Context, fullName string, prNumber int, action string) error {

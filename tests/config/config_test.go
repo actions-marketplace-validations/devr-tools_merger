@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/mergerhq/merger/internal/config"
+	"github.com/devr-tools/merger/internal/config"
 )
 
 func TestDefaults(t *testing.T) {

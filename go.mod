@@ -1,4 +1,4 @@
-module github.com/mergerhq/merger
+module github.com/devr-tools/merger
 
 go 1.25.0
 

@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mergerhq/merger/internal/domain"
-	"github.com/mergerhq/merger/internal/events"
+	"github.com/devr-tools/merger/internal/domain"
+	"github.com/devr-tools/merger/internal/events"
 )
 
 type MemoryRepository struct {

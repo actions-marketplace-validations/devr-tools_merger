@@ -5,10 +5,10 @@ import (
 	"log"
 	"os"
 
-	controlplaneapp "github.com/mergerhq/merger/internal/app/controlplane"
-	"github.com/mergerhq/merger/internal/bootstrap"
-	"github.com/mergerhq/merger/internal/config"
-	"github.com/mergerhq/merger/internal/telemetry"
+	controlplaneapp "github.com/devr-tools/merger/internal/app/controlplane"
+	"github.com/devr-tools/merger/internal/bootstrap"
+	"github.com/devr-tools/merger/internal/config"
+	"github.com/devr-tools/merger/internal/telemetry"
 )
 
 func main() {

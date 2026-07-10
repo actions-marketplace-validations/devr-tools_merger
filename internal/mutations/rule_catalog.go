@@ -1,6 +1,6 @@
 package mutations
 
-import "github.com/mergerhq/merger/internal/domain"
+import "github.com/devr-tools/merger/internal/domain"
 
 type Rule struct {
 	Name            string

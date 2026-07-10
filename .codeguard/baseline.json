@@ -1,0 +1,215 @@
+{
+  "generated_at": "2026-07-10T16:56:25Z",
+  "entries": [
+    {
+      "fingerprint": "14601059c0d9667d432ffed1715980b37f2ad8d17702e8ef271bae1e9e155eb0",
+      "context_fingerprint": "843da2e994ce2dc662ec64f1bb7f2d5a392fc5bdc8ef98d69db15757005a9911",
+      "rule_id": "security.hardcoded-credential",
+      "path": "internal/config/config.go",
+      "message": "possible hardcoded credential detected (database connection string with embedded credentials): ******"
+    },
+    {
+      "fingerprint": "1f6b29e5b08bbe363cb7d027c91543b75345d721be738dbb6efb935e3e2c20cf",
+      "context_fingerprint": "2478d68fe74c9172df4ff9760a9e7529e15660b9495164b37e7ce69081fb8f0c",
+      "rule_id": "quality.dependency-direction",
+      "path": "pkg/merger/scan.go",
+      "message": "non-CLI package imports internal implementation detail"
+    },
+    {
+      "fingerprint": "2084c18ccd09670accf0246676686b342a0b83e18f47d4b472746f7222efee3b",
+      "context_fingerprint": "6c5c5c89c9be72dd2a851665dc4aea77e64f4e888e72edf92dd3af1d43030b29",
+      "rule_id": "quality.duplicate-code",
+      "path": "cmd/merger-controlplane/main.go",
+      "message": "duplicate normalized token sequence of 92 tokens also found in cmd/merger-ingest/main.go:26 (threshold 90)"
+    },
+    {
+      "fingerprint": "2464127d69f2124c3285223fdbc2f8bef491c49bf24d55dde202762b4c536e98",
+      "context_fingerprint": "33b5f2c8fd3588fe5c96980897bd5e2d04982aac410d9d58ab95e7cbb7fbeff8",
+      "rule_id": "quality.dependency-direction",
+      "path": "pkg/merger/scan.go",
+      "message": "non-CLI package imports internal implementation detail"
+    },
+    {
+      "fingerprint": "2d204b2f89f52f9fab8c0edb6904cf18372b68646c77b4d2b2f62c28234b96e4",
+      "context_fingerprint": "f70c4ba2af33456da81aeb592ab4f7b045eabd588c01be1b77ba735d3e163043",
+      "rule_id": "quality.duplicate-code",
+      "path": "internal/ingest/processor.go",
+      "message": "duplicate normalized token sequence of 93 tokens also found in internal/app/ingest/app.go:12 (threshold 90)"
+    },
+    {
+      "fingerprint": "3068708d7222f290d0eda93f24a3c82b52531b4afe4975a6130188c2145927cb",
+      "context_fingerprint": "137779ad5d08fa40b9bf9273b90c9889df34bced59383cee68546cd3e36e6a3d",
+      "rule_id": "quality.n-plus-one-query",
+      "path": "internal/store/postgres.go",
+      "message": "query call ExecContext inside a loop suggests an N+1 query pattern; batch the query or hoist it out of the loop"
+    },
+    {
+      "fingerprint": "4c189c4632fd4a224c78010ffca577629ad3b5fd1c04499353dd027497ec6a4c",
+      "context_fingerprint": "f49269b2e0b593a1335d70ec165d4ce47171c8b60897e80b8682a25991c6aa6c",
+      "rule_id": "design.max-decls-per-file",
+      "path": "pkg/merger/types.go",
+      "message": "file has 26 declarations; max is 16"
+    },
+    {
+      "fingerprint": "6be23f9b699bc0b768f65a16a31c2c377a38b6130dcc6054848c28f41d4e10fc",
+      "context_fingerprint": "d141c66012209276b4b7e3d10d48e47433e93c113762570d38ce33c0a96ddf94",
+      "rule_id": "security.unsanitized-error-response",
+      "path": "internal/ingest/webhook_handler.go",
+      "message": "raw error value written to the HTTP response; return a generic message and log the detail server-side"
+    },
+    {
+      "fingerprint": "835fff9f850f2a7e5150d6bcfd0cb99a7d5fe49a5588f150c5b4d061a10b1744",
+      "context_fingerprint": "e2513bc28cc552c5d5e57295b88131dde9c572e3b4cff0338ef5b5bf94da4a02",
+      "rule_id": "security.unsanitized-error-response",
+      "path": "internal/controlplane/http.go",
+      "message": "raw error value written to the HTTP response; return a generic message and log the detail server-side"
+    },
+    {
+      "fingerprint": "849f45e633e3b54f732196b9ff62bf30ee7140accb193017633b83adacc0c9e7",
+      "context_fingerprint": "dc4b559d6ba36c664014d7d5ec8c60ea1b8c65598570b914dd852095afd2a8e5",
+      "rule_id": "quality.dependency-direction",
+      "path": "pkg/merger/scan.go",
+      "message": "non-CLI package imports internal implementation detail"
+    },
+    {
+      "fingerprint": "8c7baf1bfa8942e33fac4a624c5f51b7f14148b4480526e2959f8a6e1a451fa0",
+      "context_fingerprint": "4ad0300e5a8d1498cd358d2c211acbe341f574691b91ee75a578efe22d6365df",
+      "rule_id": "quality.dependency-direction",
+      "path": "pkg/merger/scan.go",
+      "message": "non-CLI package imports internal implementation detail"
+    },
+    {
+      "fingerprint": "8f116f2eac39179ad24202b12f45201a82ef19153f6eb6620169fe823b23c726",
+      "context_fingerprint": "92ebcf7bbc14bdbcb8080e40ba2fc6d0e1f63cfbaa12239f615576e89db80940",
+      "rule_id": "security.hardcoded-credential",
+      "path": "config/merger.yaml",
+      "message": "possible hardcoded credential detected (database connection string with embedded credentials): ******"
+    },
+    {
+      "fingerprint": "957e8b8700f29f3f75950db59fe05f1dbcbff925b6beeb9b8c438e3931fe4ea3",
+      "context_fingerprint": "49f00ed8b52c4f833cda5b602fb8dc3a4be0508d51b7668c047a2352fa7f1abb",
+      "rule_id": "quality.dependency-direction",
+      "path": "pkg/merger/types.go",
+      "message": "non-CLI package imports internal implementation detail"
+    },
+    {
+      "fingerprint": "99ab8e16867326a777c8a64970c5ccf95832e2c2c9f794449998de16acb74bed",
+      "context_fingerprint": "b539e1dd4b3266332b504c918e7e27ba0cf5616b45dd70b68dc5d8e44860d92e",
+      "rule_id": "quality.ai.narrative-comment",
+      "path": "internal/mcpserver/server.go",
+      "message": "comment narrates the code instead of explaining intent or constraints"
+    },
+    {
+      "fingerprint": "99e0e40d07018feefbce9229a74a1ea4a0eaa378afb218e63c345d65004cad40",
+      "context_fingerprint": "d3799c529ef8c5feb563e230deed8b0ba69d6704adc9b861bbe1b5b2548685bb",
+      "rule_id": "quality.duplicate-code",
+      "path": "internal/app/ingest/app.go",
+      "message": "duplicate normalized token sequence of 93 tokens also found in internal/ingest/processor.go:10 (threshold 90)"
+    },
+    {
+      "fingerprint": "9d1fab2c8753c4d31731c0fc6fc8488a166e334097fbc8365936bb007fdd9cc3",
+      "context_fingerprint": "54521b89d5eadc04139ca684d89405cdc67b019f88d69f493bd9c4941655e3bf",
+      "rule_id": "security.unsanitized-error-response",
+      "path": "internal/controlplane/http.go",
+      "message": "raw error value written to the HTTP response; return a generic message and log the detail server-side"
+    },
+    {
+      "fingerprint": "ab17c91b40f2cab1a8c20c30126da7e69862dfc3faf38abc66bea3694ade4210",
+      "context_fingerprint": "19efd6c600bd3b0d671645d8f3950d04861f1428b3394a59fd209bd2c74e5a98",
+      "rule_id": "quality.duplicate-code",
+      "path": "cmd/merger-ingest/main.go",
+      "message": "duplicate normalized token sequence of 92 tokens also found in cmd/merger-controlplane/main.go:20 (threshold 90)"
+    },
+    {
+      "fingerprint": "b784b1ffc79eaa0fa469a28030437f8cea137b00f20b5abc7d52a99c0cce5a21",
+      "context_fingerprint": "d429e81312f0106c7f9bbeb5360840a2d68c4e244cfe2ab1d234d0e841f59925",
+      "rule_id": "design.max-decls-per-file",
+      "path": "internal/mutations/extractors.go",
+      "message": "file has 18 declarations; max is 16"
+    },
+    {
+      "fingerprint": "c0a3762a24aadf3b8c127f5507b808d993eb44a071b2276226039faa3e2239be",
+      "context_fingerprint": "bb3d8408be1e0d24e23c713458d71177ebda60eab0c8eac0ad116bebac9fddf2",
+      "rule_id": "security.unsanitized-error-response",
+      "path": "internal/controlplane/http.go",
+      "message": "raw error value written to the HTTP response; return a generic message and log the detail server-side"
+    },
+    {
+      "fingerprint": "c864b6157617b1176500bf3d43d4a387f3490f0f17d6c75cff0361ef06ef615f",
+      "context_fingerprint": "588f5c8442bab51b553aefff23832fe8282940b5cacbbf1863740e7f14b0843d",
+      "rule_id": "quality.duplicate-code",
+      "path": "internal/ingest/files.go",
+      "message": "duplicate normalized token sequence of 173 tokens also found in internal/scan/scan.go:151 (threshold 90)"
+    },
+    {
+      "fingerprint": "d0ec9ec96ab2b8c9c045b2f0f1b0553d68e38e66b2d764b7551d3e1a1dbceed2",
+      "context_fingerprint": "e292b2fd3c1d289924fa3c5d4284aaa223658dc584fc675a4bd5e8c47ef598e0",
+      "rule_id": "security.hardcoded-secret",
+      "path": "config/merger.yaml",
+      "message": "possible hardcoded secret detected: repl…e-me"
+    },
+    {
+      "fingerprint": "d5b15969c80a95bfab766e0245505f10e8e376e5aaa06b84c950f056f924ca7d",
+      "context_fingerprint": "8178bb8fac72aab47ddf964c240f935a47caa90e26a2b7d509a64de7c13b702e",
+      "rule_id": "quality.go.alloc-in-loop",
+      "path": "internal/cli/scan.go",
+      "message": "string \"label\" grows by concatenation inside a loop; use strings.Builder"
+    },
+    {
+      "fingerprint": "d5f4a2cc597596677f40a86c065588fcd4abecc840f88d25a496130772c3a7b9",
+      "context_fingerprint": "fa313d63fcf0092515f350b335f6c2bd8c9666b905d728654b542b1c5c2376cd",
+      "rule_id": "quality.go.alloc-in-loop",
+      "path": "internal/cli/scan.go",
+      "message": "string \"label\" grows by concatenation inside a loop; use strings.Builder"
+    },
+    {
+      "fingerprint": "e00ef594ab252b02e560dd91a397bbe08527b082f2b2b2f6501733d60a53a420",
+      "context_fingerprint": "71a4939b81fcc48a132563d5496ec675a6fe33fb99e70e3769201c669c42e39e",
+      "rule_id": "quality.dependency-direction",
+      "path": "pkg/merger/types.go",
+      "message": "non-CLI package imports internal implementation detail"
+    },
+    {
+      "fingerprint": "ea2459eb71264121d8fab825eb1d5f08ae9218a684e5514d6e9aec1a21eefcca",
+      "context_fingerprint": "61334af2e2b590b0855cd96d6dce593856a133819f8ae4bb593265901c504d13",
+      "rule_id": "quality.ai.narrative-comment",
+      "path": "internal/mcpserver/tools.go",
+      "message": "comment narrates the code instead of explaining intent or constraints"
+    },
+    {
+      "fingerprint": "f5acf321e5f4cb2139e95f072559a6decbf6bddb9851ce7b3e9bf493c6a4f158",
+      "context_fingerprint": "f493e5464dcf828b0bc8f3faa298900fabeafa3814ef0137511012ea06b0b741",
+      "rule_id": "security.unsanitized-error-response",
+      "path": "internal/controlplane/http.go",
+      "message": "raw error value written to the HTTP response; return a generic message and log the detail server-side"
+    },
+    {
+      "fingerprint": "f6766d61f2294cc8fd31e60dd7955e19631c83e1fb700d8d958a5a6b39cc3639",
+      "context_fingerprint": "ce9405b974574f3a0eff2f4892c0040b8e17488bc8e1cf9839b6562000c442ec",
+      "rule_id": "quality.duplicate-code",
+      "path": "internal/scan/scan.go",
+      "message": "duplicate normalized token sequence of 173 tokens also found in internal/ingest/files.go:11 (threshold 90)"
+    },
+    {
+      "fingerprint": "f926acffc81704ec8fe4e2dfd7b84e87da32810462918259493de20b8ab2be2b",
+      "context_fingerprint": "9ef56cdf8c6de314900e2246be220d5b127f5a94d50c5aada0641cc799b66a45",
+      "rule_id": "quality.dependency-direction",
+      "path": "pkg/merger/types.go",
+      "message": "non-CLI package imports internal implementation detail"
+    },
+    {
+      "fingerprint": "fc319cded3abcd14e8344ba6e4aa2dc78e8ebec4c7bd421df53d411dd2ab448e",
+      "context_fingerprint": "505176ea843bc21068c5764c14f2f12f75ec21fdf5424d49439cfa0893cfa1e8",
+      "rule_id": "quality.ai.narrative-comment",
+      "path": "internal/cli/cli.go",
+      "message": "comment narrates the code instead of explaining intent or constraints"
+    },
+    {
+      "fingerprint": "fc46f082e91b81f574a98d86d2b1c94d172f5a816505a543cfb31e984dd55a6b",
+      "context_fingerprint": "ea353a4ca6a29e3d1be5e4f715cb018d5a3d178d7e7e581d1709eba51aeaae3b",
+      "rule_id": "security.unsanitized-error-response",
+      "path": "internal/ingest/webhook_handler.go",
+      "message": "raw error value written to the HTTP response; return a generic message and log the detail server-side"
+    }
+  ]
+}

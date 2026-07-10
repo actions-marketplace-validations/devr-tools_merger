@@ -1,6 +1,6 @@
 package policy
 
-import "github.com/mergerhq/merger/internal/domain"
+import "github.com/devr-tools/merger/internal/domain"
 
 type Config struct {
 	Policies []RuleConfig `yaml:"policies"`

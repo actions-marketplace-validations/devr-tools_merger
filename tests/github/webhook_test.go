@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/mergerhq/merger/internal/github"
+	"github.com/devr-tools/merger/internal/github"
 )
 
 func TestWebhookDecoderRejectsInvalidSignature(t *testing.T) {

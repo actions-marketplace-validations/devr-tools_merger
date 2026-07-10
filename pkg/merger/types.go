@@ -1,9 +1,9 @@
 package merger
 
 import (
-	"github.com/mergerhq/merger/internal/domain"
-	"github.com/mergerhq/merger/internal/events"
-	"github.com/mergerhq/merger/internal/runtimegraph"
+	"github.com/devr-tools/merger/internal/domain"
+	"github.com/devr-tools/merger/internal/events"
+	"github.com/devr-tools/merger/internal/runtimegraph"
 )
 
 type Author = domain.Author

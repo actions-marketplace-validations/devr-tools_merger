@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
-	"github.com/mergerhq/merger/internal/controlplane"
-	"github.com/mergerhq/merger/internal/store"
-	mergerv1 "github.com/mergerhq/merger/proto/merger/v1"
+	"github.com/devr-tools/merger/internal/controlplane"
+	"github.com/devr-tools/merger/internal/store"
+	mergerv1 "github.com/devr-tools/merger/proto/merger/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

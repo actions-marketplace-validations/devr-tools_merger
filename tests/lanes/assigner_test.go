@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/mergerhq/merger/internal/domain"
-	"github.com/mergerhq/merger/internal/lanes"
+	"github.com/devr-tools/merger/internal/domain"
+	"github.com/devr-tools/merger/internal/lanes"
 )
 
 func TestAssignerReturnsGreenForLowRiskAutomatableChanges(t *testing.T) {

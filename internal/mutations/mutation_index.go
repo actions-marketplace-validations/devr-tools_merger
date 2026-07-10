@@ -1,8 +1,8 @@
 package mutations
 
 import (
-	"github.com/mergerhq/merger/internal/domain"
-	"github.com/mergerhq/merger/pkg/identity"
+	"github.com/devr-tools/merger/internal/domain"
+	"github.com/devr-tools/merger/pkg/identity"
 )
 
 func addMutation(index map[domain.MutationKind]*domain.Mutation, candidate domain.Mutation) {

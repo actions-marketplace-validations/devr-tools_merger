@@ -3,7 +3,7 @@ package events
 import (
 	"fmt"
 
-	"github.com/mergerhq/merger/internal/config"
+	"github.com/devr-tools/merger/internal/config"
 )
 
 func NewBusFromConfig(cfg config.EventsConfig) (Bus, error) {

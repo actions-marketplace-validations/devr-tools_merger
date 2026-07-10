@@ -19,6 +19,7 @@ env:
   GOVULNCHECK_VERSION: v1.3.0
   GOCYCLO_VERSION: v0.6.0
   MIN_INTERNAL_COVERAGE: "60.0"
+  CODEGUARD_VERSION: v0.8.1
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -114,6 +115,31 @@ jobs:
               echo "No functions exceeded the \`gocyclo\` limit of 15."
             fi
           } >> "$GITHUB_STEP_SUMMARY"
+
+  codeguard:
+    name: codeguard
+    needs:
+      - vet
+      - gocyclo
+    runs-on: ubuntu-latest
+    env:
+      PR_BASE_REF: ${{ github.base_ref }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Fetch base branch
+        run: git fetch origin "${PR_BASE_REF}" --depth=1
+
+      - name: Run codeguard
+        uses: devr-tools/codeguard@v0.8.1
+        with:
+          config: .codeguard
+          mode: diff
+          base-ref: origin/${{ github.base_ref }}
+          format: github
+          version: ${{ env.CODEGUARD_VERSION }}
 
   test:
     name: test (${{ matrix.label }})
@@ -321,7 +347,9 @@ jobs:
           fetch-depth: 0
 
       - name: Run Semgrep
-        run: semgrep scan --config auto --baseline-commit "${{ github.event.pull_request.base.sha }}" --error
+        # mutable-action-tag is excluded: merger intentionally pins actions to
+        # version tags (matching the sibling devr-tools tools), not commit SHAs.
+        run: semgrep scan --config auto --baseline-commit "${{ github.event.pull_request.base.sha }}" --exclude-rule yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag --error
 
   benchmark:
     name: benchmark

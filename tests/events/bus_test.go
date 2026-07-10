@@ -5,8 +5,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/mergerhq/merger/internal/config"
-	"github.com/mergerhq/merger/internal/events"
+	"github.com/devr-tools/merger/internal/config"
+	"github.com/devr-tools/merger/internal/events"
 )
 
 func TestMemoryBusPublishSubscribeAndClose(t *testing.T) {

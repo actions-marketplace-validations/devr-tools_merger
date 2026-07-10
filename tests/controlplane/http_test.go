@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mergerhq/merger/internal/controlplane"
-	"github.com/mergerhq/merger/internal/domain"
-	"github.com/mergerhq/merger/internal/store"
+	"github.com/devr-tools/merger/internal/controlplane"
+	"github.com/devr-tools/merger/internal/domain"
+	"github.com/devr-tools/merger/internal/store"
 )
 
 func TestHTTPHandlerReturnsChangePacketView(t *testing.T) {

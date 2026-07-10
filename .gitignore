@@ -7,3 +7,7 @@ dist/
 coverage.out
 *.test
 vendor/
+# codeguard: track only the config and baseline; everything else is generated.
+.codeguard/*
+!.codeguard/codeguard.yaml
+!.codeguard/baseline.json

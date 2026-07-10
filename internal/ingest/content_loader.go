@@ -3,7 +3,7 @@ package ingest
 import (
 	"context"
 
-	"github.com/mergerhq/merger/internal/github"
+	"github.com/devr-tools/merger/internal/github"
 )
 
 type githubContentLoader struct {

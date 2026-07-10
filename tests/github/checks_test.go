@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/mergerhq/merger/internal/github"
+	"github.com/devr-tools/merger/internal/github"
 )
 
 func TestClientPublishCheckRun(t *testing.T) {

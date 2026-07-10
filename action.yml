@@ -1,0 +1,73 @@
+name: Devr Merger
+description: Analyze a pull request diff, classify mutations, and assign a merge lane with Devr Merger
+branding:
+  icon: git-merge
+  color: purple
+
+inputs:
+  base-ref:
+    description: Base ref to diff against (scans `git diff <base-ref>...HEAD`)
+    required: false
+    default: main
+  config:
+    description: "Path to a merger config file or directory (default: auto-discover)"
+    required: false
+    default: ""
+  repo-root:
+    description: Repository root for content lookups and relative paths
+    required: false
+    default: "."
+  format:
+    description: Output format (text or json)
+    required: false
+    default: text
+  fail-on-lane:
+    description: Fail the workflow when the assigned lane is at or above this lane (GREEN|YELLOW|RED|BLACK). Empty means report only.
+    required: false
+    default: ""
+  version:
+    description: Devr Merger version to install
+    required: false
+    default: latest
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Go
+      uses: actions/setup-go@v6
+      with:
+        go-version: "1.25"
+
+    - name: Install Devr Merger
+      shell: bash
+      env:
+        VERSION: ${{ inputs.version }}
+      run: go install "github.com/devr-tools/merger/cmd/merger@${VERSION}"
+
+    - name: Run Devr Merger scan
+      id: scan
+      shell: bash
+      env:
+        BASE_REF: ${{ inputs.base-ref }}
+        REPO_ROOT: ${{ inputs.repo-root }}
+        FORMAT: ${{ inputs.format }}
+        CONFIG: ${{ inputs.config }}
+        FAIL_ON_LANE: ${{ inputs.fail-on-lane }}
+      run: |
+        set +e
+        args=(scan -base-ref "$BASE_REF" -repo-root "$REPO_ROOT" -format "$FORMAT")
+        if [ -n "$CONFIG" ]; then
+          args+=(-config "$CONFIG")
+        fi
+        if [ -n "$FAIL_ON_LANE" ]; then
+          args+=(-fail-on-lane "$FAIL_ON_LANE")
+        fi
+        merger "${args[@]}"
+        status=$?
+        echo "exit_code=$status" >> "$GITHUB_OUTPUT"
+        exit 0
+
+    - name: Fail workflow on Devr Merger gate
+      if: ${{ steps.scan.outputs.exit_code != '0' }}
+      shell: bash
+      run: exit "${{ steps.scan.outputs.exit_code }}"

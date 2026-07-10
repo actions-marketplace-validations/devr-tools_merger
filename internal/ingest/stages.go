@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/mergerhq/merger/internal/domain"
-	"github.com/mergerhq/merger/internal/github"
-	"github.com/mergerhq/merger/internal/mutations"
-	"github.com/mergerhq/merger/internal/runtimegraph"
+	"github.com/devr-tools/merger/internal/domain"
+	"github.com/devr-tools/merger/internal/github"
+	"github.com/devr-tools/merger/internal/mutations"
+	"github.com/devr-tools/merger/internal/runtimegraph"
 )
 
 func (p *Processor) enrichMutations(ctx context.Context, packet *domain.ChangePacket, service github.Service, repoOwner, repoName string) error {

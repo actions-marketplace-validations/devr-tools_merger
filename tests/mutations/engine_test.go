@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/mergerhq/merger/internal/domain"
-	"github.com/mergerhq/merger/internal/mutations"
+	"github.com/devr-tools/merger/internal/domain"
+	"github.com/devr-tools/merger/internal/mutations"
 )
 
 func TestDefaultEngineClassifiesSchemaMutation(t *testing.T) {

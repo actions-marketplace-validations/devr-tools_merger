@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mergerhq/merger/internal/domain"
-	"github.com/mergerhq/merger/internal/store"
+	"github.com/devr-tools/merger/internal/domain"
+	"github.com/devr-tools/merger/internal/store"
 )
 
 func TestMemoryRepositoryPersistsEvidenceFromChangePacket(t *testing.T) {

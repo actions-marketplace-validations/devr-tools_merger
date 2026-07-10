@@ -1,6 +1,6 @@
 package risk
 
-import "github.com/mergerhq/merger/internal/domain"
+import "github.com/devr-tools/merger/internal/domain"
 
 func severityFromScore(score int) domain.Severity {
 	switch {

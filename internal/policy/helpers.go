@@ -3,7 +3,7 @@ package policy
 import (
 	"strings"
 
-	"github.com/mergerhq/merger/internal/domain"
+	"github.com/devr-tools/merger/internal/domain"
 )
 
 func appendUniqueReviewer(values []domain.ReviewerRequirement, candidate domain.ReviewerRequirement) []domain.ReviewerRequirement {
