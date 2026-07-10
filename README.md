@@ -38,6 +38,7 @@ or a CI job.
 
 ```bash
 go install github.com/devr-tools/merger/cmd/merger@latest
+# or: brew install devr-tools/tap/merger
 
 merger init                       # scaffold .merger/ config + policy
 merger validate                   # check config and policy resolve

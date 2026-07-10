@@ -20,6 +20,15 @@
 
 ### Ecosystem
 
+* add the `github.com/devr-tools/merger/pkg/merger` SDK (`Scan`, `LoadPolicy`,
+  `DefaultLanes`) wrapping the offline pipeline
+* rename the Go module to `github.com/devr-tools/merger` to match the GitHub
+  home so `go install` and Homebrew resolve correctly (**breaking**: import
+  paths change from `github.com/mergerhq/merger/...`)
+* publish a composite GitHub Action (`action.yml`) that installs the CLI and
+  runs `merger scan` with an optional `fail-on-lane` gate
+* wire Homebrew distribution: `sync-homebrew-formula` in the release workflow
+  and `homebrew-validation.yml` for PR validation
 * adopt the devr-tools tool-family conventions: Apache-2.0 `LICENSE`,
   `internal/version` package, `.golangci.yml` lint config, `SECURITY.md`,
   `CONTRIBUTING.md`, and this changelog

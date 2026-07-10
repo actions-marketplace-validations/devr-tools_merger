@@ -1,0 +1,65 @@
+name: Devr Merger
+description: Analyze a pull request diff, classify mutations, and assign a merge lane with Devr Merger
+branding:
+  icon: git-merge
+  color: purple
+
+inputs:
+  base-ref:
+    description: Base ref to diff against (scans `git diff <base-ref>...HEAD`)
+    required: false
+    default: main
+  config:
+    description: "Path to a merger config file or directory (default: auto-discover)"
+    required: false
+    default: ""
+  repo-root:
+    description: Repository root for content lookups and relative paths
+    required: false
+    default: "."
+  format:
+    description: Output format (text or json)
+    required: false
+    default: text
+  fail-on-lane:
+    description: Fail the workflow when the assigned lane is at or above this lane (GREEN|YELLOW|RED|BLACK). Empty means report only.
+    required: false
+    default: ""
+  version:
+    description: Devr Merger version to install
+    required: false
+    default: latest
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Go
+      uses: actions/setup-go@v6
+      with:
+        go-version: "1.25"
+
+    - name: Install Devr Merger
+      shell: bash
+      run: go install github.com/devr-tools/merger/cmd/merger@${{ inputs.version }}
+
+    - name: Run Devr Merger scan
+      id: scan
+      shell: bash
+      run: |
+        set +e
+        args=(scan -base-ref "${{ inputs.base-ref }}" -repo-root "${{ inputs.repo-root }}" -format "${{ inputs.format }}")
+        if [ -n "${{ inputs.config }}" ]; then
+          args+=(-config "${{ inputs.config }}")
+        fi
+        if [ -n "${{ inputs.fail-on-lane }}" ]; then
+          args+=(-fail-on-lane "${{ inputs.fail-on-lane }}")
+        fi
+        merger "${args[@]}"
+        status=$?
+        echo "exit_code=$status" >> "$GITHUB_OUTPUT"
+        exit 0
+
+    - name: Fail workflow on Devr Merger gate
+      if: ${{ steps.scan.outputs.exit_code != '0' }}
+      shell: bash
+      run: exit "${{ steps.scan.outputs.exit_code }}"

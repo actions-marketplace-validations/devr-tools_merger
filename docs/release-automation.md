@@ -51,7 +51,8 @@ Stable-branch release preparation is driven by:
 Each tagged release currently publishes:
 
 - `darwin/amd64`, `darwin/arm64`, `linux/amd64`, `linux/arm64` archives, each
-  containing the `merger-ingest` and `merger-controlplane` binaries;
+  containing the `merger` CLI plus the `merger-ingest` and `merger-controlplane`
+  binaries;
 - `SHA256SUMS`;
 - `ghcr.io/devr-tools/merger:<tag>` (multi-arch: `-amd64`, `-arm64`).
 
@@ -70,8 +71,25 @@ make release-snapshot  # build a local snapshot into dist/ without publishing
 make commit            # guided conventional-commit helper
 ```
 
+## Homebrew
+
+`brew install devr-tools/tap/merger` installs the CLI. Stable releases open a
+formula-update PR against `devr-tools/homebrew-tap` via the
+`sync-homebrew-formula` job in `release.yml`; `homebrew-validation.yml` builds
+and tests the formula from source on every PR.
+
+One-time setup: seed `Formula/merger.rb` in the tap repository before the first
+automated sync (the sync job patches an existing formula; the validation
+workflow generates one from scratch and works as a template).
+
+## GitHub Action
+
+`action.yml` publishes a composite action that installs the CLI and runs
+`merger scan`; point it at a base ref and optionally set `fail-on-lane` to gate
+a workflow.
+
 ## Not Yet Wired
 
-- **Homebrew tap sync** and **npm/pip distribution** are deferred until the
-  user-facing `merger` CLI binary lands (see the CLI phase of the ecosystem
-  build-up); those channels distribute a CLI, not the daemons.
+- **npm/pip distribution** — deferred. Both distribute the CLI binary and can be
+  added the same way the sibling tools package it (`@devr-tools/merger`,
+  `devr-merger`).
