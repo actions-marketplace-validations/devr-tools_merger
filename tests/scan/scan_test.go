@@ -5,10 +5,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mergerhq/merger/internal/domain"
-	"github.com/mergerhq/merger/internal/lanes"
-	"github.com/mergerhq/merger/internal/policy"
-	"github.com/mergerhq/merger/internal/scan"
+	"github.com/devr-tools/merger/internal/domain"
+	"github.com/devr-tools/merger/internal/lanes"
+	"github.com/devr-tools/merger/internal/policy"
+	"github.com/devr-tools/merger/internal/scan"
 )
 
 const authDiff = `diff --git a/internal/auth/session.go b/internal/auth/session.go

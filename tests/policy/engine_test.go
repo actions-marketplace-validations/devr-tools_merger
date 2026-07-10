@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/mergerhq/merger/internal/domain"
-	"github.com/mergerhq/merger/internal/policy"
+	"github.com/devr-tools/merger/internal/domain"
+	"github.com/devr-tools/merger/internal/policy"
 )
 
 func TestPolicyRequiresSecurityReviewForAuthMutation(t *testing.T) {

@@ -3,10 +3,10 @@ package merger
 import (
 	"context"
 
-	"github.com/mergerhq/merger/internal/config"
-	"github.com/mergerhq/merger/internal/lanes"
-	"github.com/mergerhq/merger/internal/policy"
-	"github.com/mergerhq/merger/internal/scan"
+	"github.com/devr-tools/merger/internal/config"
+	"github.com/devr-tools/merger/internal/lanes"
+	"github.com/devr-tools/merger/internal/policy"
+	"github.com/devr-tools/merger/internal/scan"
 )
 
 // ScanOptions configures an offline scan. See Scan.

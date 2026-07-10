@@ -1,6 +1,6 @@
 package risk
 
-import "github.com/mergerhq/merger/internal/domain"
+import "github.com/devr-tools/merger/internal/domain"
 
 func defaultWeights() map[domain.MutationKind]int {
 	return map[domain.MutationKind]int{

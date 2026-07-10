@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/mergerhq/merger/internal/config"
+	"github.com/devr-tools/merger/internal/config"
 )
 
 func runValidate(args []string) error {

@@ -10,7 +10,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/mergerhq/merger/internal/version"
+	"github.com/devr-tools/merger/internal/version"
 )
 
 // ExitError carries an explicit process exit code. Commands return it when the

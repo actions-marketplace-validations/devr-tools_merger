@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/mergerhq/merger/internal/config"
-	"github.com/mergerhq/merger/internal/events"
-	"github.com/mergerhq/merger/internal/github"
-	"github.com/mergerhq/merger/internal/store"
+	"github.com/devr-tools/merger/internal/config"
+	"github.com/devr-tools/merger/internal/events"
+	"github.com/devr-tools/merger/internal/github"
+	"github.com/devr-tools/merger/internal/store"
 )
 
 func BuildRepository(ctx context.Context, cfg config.Config) (store.Repository, error) {

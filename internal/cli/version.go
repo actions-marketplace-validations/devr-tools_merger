@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/mergerhq/merger/internal/version"
+	"github.com/devr-tools/merger/internal/version"
 )
 
 func runVersion(args []string) error {

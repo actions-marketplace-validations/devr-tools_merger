@@ -10,9 +10,9 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/mergerhq/merger/internal/domain"
-	"github.com/mergerhq/merger/internal/lanes"
-	"github.com/mergerhq/merger/internal/scan"
+	"github.com/devr-tools/merger/internal/domain"
+	"github.com/devr-tools/merger/internal/lanes"
+	"github.com/devr-tools/merger/internal/scan"
 )
 
 var laneRank = map[domain.MergeLane]int{

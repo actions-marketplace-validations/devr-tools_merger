@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mergerhq/merger/internal/cli"
+	"github.com/devr-tools/merger/internal/cli"
 )
 
 const authDiff = `diff --git a/internal/auth/session.go b/internal/auth/session.go

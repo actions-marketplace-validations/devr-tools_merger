@@ -5,7 +5,7 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/mergerhq/merger/pkg/identity"
+	"github.com/devr-tools/merger/pkg/identity"
 )
 
 type EventType string

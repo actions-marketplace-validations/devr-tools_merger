@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/mergerhq/merger/internal/config"
-	"github.com/mergerhq/merger/internal/policy"
+	"github.com/devr-tools/merger/internal/config"
+	"github.com/devr-tools/merger/internal/policy"
 )
 
 // configCandidates lists the config locations merger auto-discovers, in

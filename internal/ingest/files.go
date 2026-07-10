@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/mergerhq/merger/internal/domain"
-	"github.com/mergerhq/merger/pkg/diff"
+	"github.com/devr-tools/merger/internal/domain"
+	"github.com/devr-tools/merger/pkg/diff"
 )
 
 func mapChangedFiles(files []diff.File) []domain.ChangedFile {

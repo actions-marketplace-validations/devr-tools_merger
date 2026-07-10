@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/mergerhq/merger/pkg/merger"
+	"github.com/devr-tools/merger/pkg/merger"
 )
 
 const schemaDiff = `diff --git a/db/migrations/007_add_orders.sql b/db/migrations/007_add_orders.sql

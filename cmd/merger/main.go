@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/mergerhq/merger/internal/cli"
+	"github.com/devr-tools/merger/internal/cli"
 )
 
 func main() {

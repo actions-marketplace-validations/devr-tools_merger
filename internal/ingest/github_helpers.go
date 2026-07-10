@@ -3,7 +3,7 @@ package ingest
 import (
 	"fmt"
 
-	"github.com/mergerhq/merger/internal/github"
+	"github.com/devr-tools/merger/internal/github"
 )
 
 func bindInstallation(service github.Service, installationID int64) github.Service {

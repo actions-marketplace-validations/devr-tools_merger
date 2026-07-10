@@ -4,7 +4,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/mergerhq/merger/internal/domain"
+	"github.com/devr-tools/merger/internal/domain"
 )
 
 func (r Rule) Matches(filePath string, signals []domain.MutationSignal) bool {

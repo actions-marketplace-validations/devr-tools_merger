@@ -13,7 +13,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/mergerhq/merger/internal/github"
+	"github.com/devr-tools/merger/internal/github"
 )
 
 func newTestClient(t *testing.T, transport http.RoundTripper) *github.Client {

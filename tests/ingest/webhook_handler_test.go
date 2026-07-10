@@ -7,15 +7,15 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/mergerhq/merger/internal/events"
-	"github.com/mergerhq/merger/internal/github"
-	"github.com/mergerhq/merger/internal/ingest"
-	"github.com/mergerhq/merger/internal/lanes"
-	"github.com/mergerhq/merger/internal/mutations"
-	"github.com/mergerhq/merger/internal/policy"
-	"github.com/mergerhq/merger/internal/risk"
-	"github.com/mergerhq/merger/internal/runtimegraph"
-	"github.com/mergerhq/merger/internal/telemetry"
+	"github.com/devr-tools/merger/internal/events"
+	"github.com/devr-tools/merger/internal/github"
+	"github.com/devr-tools/merger/internal/ingest"
+	"github.com/devr-tools/merger/internal/lanes"
+	"github.com/devr-tools/merger/internal/mutations"
+	"github.com/devr-tools/merger/internal/policy"
+	"github.com/devr-tools/merger/internal/risk"
+	"github.com/devr-tools/merger/internal/runtimegraph"
+	"github.com/devr-tools/merger/internal/telemetry"
 )
 
 func TestWebhookHandlerRejectsInvalidWebhook(t *testing.T) {

@@ -3,8 +3,8 @@ package ingest
 import (
 	"context"
 
-	"github.com/mergerhq/merger/internal/domain"
-	"github.com/mergerhq/merger/internal/github"
+	"github.com/devr-tools/merger/internal/domain"
+	"github.com/devr-tools/merger/internal/github"
 )
 
 func (p *Processor) processPROpened(ctx context.Context, payload github.PullRequestWebhookPayload) (*domain.ChangePacket, error) {

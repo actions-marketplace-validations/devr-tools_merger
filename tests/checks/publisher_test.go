@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/mergerhq/merger/internal/checks"
-	"github.com/mergerhq/merger/internal/domain"
-	"github.com/mergerhq/merger/internal/github"
+	"github.com/devr-tools/merger/internal/checks"
+	"github.com/devr-tools/merger/internal/domain"
+	"github.com/devr-tools/merger/internal/github"
 )
 
 func TestPublishNoopsWithoutClient(t *testing.T) {

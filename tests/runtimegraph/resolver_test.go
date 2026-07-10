@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/mergerhq/merger/internal/domain"
-	"github.com/mergerhq/merger/internal/runtimegraph"
+	"github.com/devr-tools/merger/internal/domain"
+	"github.com/devr-tools/merger/internal/runtimegraph"
 )
 
 func TestResolverDerivesOwnershipFromTopology(t *testing.T) {

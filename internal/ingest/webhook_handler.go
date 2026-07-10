@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/mergerhq/merger/internal/github"
-	"github.com/mergerhq/merger/internal/telemetry"
-	"github.com/mergerhq/merger/pkg/identity"
+	"github.com/devr-tools/merger/internal/github"
+	"github.com/devr-tools/merger/internal/telemetry"
+	"github.com/devr-tools/merger/pkg/identity"
 )
 
 type WebhookHandler struct {

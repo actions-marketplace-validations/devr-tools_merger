@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package merger.v1;
 
-option go_package = "github.com/mergerhq/merger/proto/merger/v1;mergerv1";
+option go_package = "github.com/devr-tools/merger/proto/merger/v1;mergerv1";
 
 message ChangePacketRef {
   string id = 1;

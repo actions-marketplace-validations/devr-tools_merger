@@ -3,7 +3,7 @@ package extensions
 import (
 	"context"
 
-	"github.com/mergerhq/merger/pkg/merger"
+	"github.com/devr-tools/merger/pkg/merger"
 )
 
 type EventHandler func(context.Context, merger.Envelope) error

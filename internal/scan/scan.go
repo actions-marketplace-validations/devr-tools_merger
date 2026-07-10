@@ -13,14 +13,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mergerhq/merger/internal/domain"
-	"github.com/mergerhq/merger/internal/lanes"
-	"github.com/mergerhq/merger/internal/mutations"
-	"github.com/mergerhq/merger/internal/policy"
-	"github.com/mergerhq/merger/internal/risk"
-	"github.com/mergerhq/merger/internal/runtimegraph"
-	"github.com/mergerhq/merger/pkg/diff"
-	"github.com/mergerhq/merger/pkg/identity"
+	"github.com/devr-tools/merger/internal/domain"
+	"github.com/devr-tools/merger/internal/lanes"
+	"github.com/devr-tools/merger/internal/mutations"
+	"github.com/devr-tools/merger/internal/policy"
+	"github.com/devr-tools/merger/internal/risk"
+	"github.com/devr-tools/merger/internal/runtimegraph"
+	"github.com/devr-tools/merger/pkg/diff"
+	"github.com/devr-tools/merger/pkg/identity"
 )
 
 // Options configures an offline scan.

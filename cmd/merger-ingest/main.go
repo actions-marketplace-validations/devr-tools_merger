@@ -5,11 +5,11 @@ import (
 	"log"
 	"os"
 
-	ingestapp "github.com/mergerhq/merger/internal/app/ingest"
-	"github.com/mergerhq/merger/internal/bootstrap"
-	"github.com/mergerhq/merger/internal/config"
-	"github.com/mergerhq/merger/internal/policy"
-	"github.com/mergerhq/merger/internal/telemetry"
+	ingestapp "github.com/devr-tools/merger/internal/app/ingest"
+	"github.com/devr-tools/merger/internal/bootstrap"
+	"github.com/devr-tools/merger/internal/config"
+	"github.com/devr-tools/merger/internal/policy"
+	"github.com/devr-tools/merger/internal/telemetry"
 )
 
 func main() {

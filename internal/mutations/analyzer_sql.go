@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/mergerhq/merger/internal/domain"
-	"github.com/mergerhq/merger/pkg/identity"
+	"github.com/devr-tools/merger/internal/domain"
+	"github.com/devr-tools/merger/pkg/identity"
 )
 
 func (sqlDDLAnalyzer) Name() string { return "sql-ddl-analyzer" }

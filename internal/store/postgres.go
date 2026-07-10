@@ -10,8 +10,8 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"github.com/mergerhq/merger/internal/domain"
-	"github.com/mergerhq/merger/internal/events"
+	"github.com/devr-tools/merger/internal/domain"
+	"github.com/devr-tools/merger/internal/events"
 )
 
 type PostgresRepository struct {

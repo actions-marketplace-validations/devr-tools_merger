@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/mergerhq/merger/internal/domain"
+	"github.com/devr-tools/merger/internal/domain"
 )
 
 type codeOwnersSource struct{}

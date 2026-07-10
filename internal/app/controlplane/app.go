@@ -6,13 +6,13 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/mergerhq/merger/internal/config"
-	"github.com/mergerhq/merger/internal/controlplane"
-	controlplanegrpc "github.com/mergerhq/merger/internal/controlplanegrpc"
-	"github.com/mergerhq/merger/internal/events"
-	"github.com/mergerhq/merger/internal/store"
-	"github.com/mergerhq/merger/internal/telemetry"
-	mergerv1 "github.com/mergerhq/merger/proto/merger/v1"
+	"github.com/devr-tools/merger/internal/config"
+	"github.com/devr-tools/merger/internal/controlplane"
+	controlplanegrpc "github.com/devr-tools/merger/internal/controlplanegrpc"
+	"github.com/devr-tools/merger/internal/events"
+	"github.com/devr-tools/merger/internal/store"
+	"github.com/devr-tools/merger/internal/telemetry"
+	mergerv1 "github.com/devr-tools/merger/proto/merger/v1"
 	"google.golang.org/grpc"
 )
 

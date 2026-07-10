@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/mergerhq/merger/internal/domain"
+	"github.com/devr-tools/merger/internal/domain"
 )
 
 func (e *WeightedEngine) Evaluate(_ context.Context, packet domain.ChangePacket) (domain.RiskSummary, []domain.Risk, error) {
