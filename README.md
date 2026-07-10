@@ -29,6 +29,32 @@ This repository scaffolds the first production-oriented control plane slice:
 - Internal event bus abstraction
 - Structured logging and trace-ready instrumentation
 
+## CLI
+
+The `merger` CLI is the local, installable face of the control plane. It runs
+the same analysis pipeline offline — no services, database, or event bus
+required — so you can classify a diff and preview its merge lane from a laptop
+or a CI job.
+
+```bash
+go install github.com/devr-tools/merger/cmd/merger@latest
+
+merger init                       # scaffold .merger/ config + policy
+merger validate                   # check config and policy resolve
+merger scan -base-ref origin/main # analyze the diff vs a base ref
+merger scan -diff change.diff -format json
+```
+
+`merger scan` parses a unified diff (from `-diff <file|->` or a
+`-base-ref <ref>` git range), runs mutation detection, runtime-graph, risk,
+policy, and lane assignment, and prints a report (`-format text|json`). Pass
+`-fail-on-lane RED` to exit non-zero when a change lands in a given lane or
+higher — useful as a CI gate.
+
+Configuration is auto-discovered from `merger.yaml` or `.merger/merger.yaml`
+(see [internal/cli](/Users/alex/Documents/GitHub/merger/internal/cli:1) and the
+offline pipeline in [internal/scan](/Users/alex/Documents/GitHub/merger/internal/scan/scan.go:1)).
+
 ## Architecture
 
 The repository is organized around domain boundaries instead of a single service package:

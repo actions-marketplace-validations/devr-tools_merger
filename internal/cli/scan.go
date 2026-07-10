@@ -1,0 +1,214 @@
+package cli
+
+import (
+	"context"
+	"encoding/json"
+	"flag"
+	"fmt"
+	"io"
+	"os"
+	"os/exec"
+	"strings"
+
+	"github.com/mergerhq/merger/internal/domain"
+	"github.com/mergerhq/merger/internal/lanes"
+	"github.com/mergerhq/merger/internal/scan"
+)
+
+var laneRank = map[domain.MergeLane]int{
+	domain.MergeLaneGreen:  1,
+	domain.MergeLaneYellow: 2,
+	domain.MergeLaneRed:    3,
+	domain.MergeLaneBlack:  4,
+}
+
+func runScan(ctx context.Context, args []string) error {
+	fs := flag.NewFlagSet("scan", flag.ContinueOnError)
+	root := fs.String("repo-root", ".", "repository root for content lookups and relative paths")
+	configPath := fs.String("config", "", "path to a merger config file or directory (default: auto-discover)")
+	policyPath := fs.String("policy", "", "path to a policy file (default: config's policy.path)")
+	diffPath := fs.String("diff", "", "unified diff file to scan, or '-' for stdin")
+	baseRef := fs.String("base-ref", "", "git base ref; scans `git diff <base-ref>...HEAD` when -diff is unset")
+	format := fs.String("format", "text", "output format: text or json")
+	failOn := fs.String("fail-on-lane", "", "exit non-zero when the assigned lane is at or above this lane (GREEN|YELLOW|RED|BLACK)")
+	repo := fs.String("repo", "", "repository identifier as owner/name (optional)")
+	ref := fs.String("ref", "", "revision the diff targets (optional)")
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+
+	if *format != "text" && *format != "json" {
+		return ExitError{Code: 2, Message: fmt.Sprintf("unknown format %q (want text or json)", *format)}
+	}
+
+	failLane, err := parseFailLane(*failOn)
+	if err != nil {
+		return ExitError{Code: 2, Message: err.Error()}
+	}
+
+	rawDiff, err := readDiff(*root, *diffPath, *baseRef)
+	if err != nil {
+		return err
+	}
+
+	options, err := buildScanOptions(*root, *configPath, *policyPath, *repo, *ref, rawDiff, *format == "text")
+	if err != nil {
+		return err
+	}
+
+	packet, err := scan.Run(ctx, options)
+	if err != nil {
+		return err
+	}
+
+	if *format == "json" {
+		if err := writeJSON(os.Stdout, packet); err != nil {
+			return err
+		}
+	} else {
+		writeTextReport(os.Stdout, packet)
+	}
+
+	if failLane != "" && laneRank[packet.MergeLane] >= laneRank[failLane] {
+		return ExitError{Code: 2, Message: fmt.Sprintf("merge lane %s is at or above the -fail-on-lane threshold %s", packet.MergeLane, failLane)}
+	}
+	return nil
+}
+
+// buildScanOptions discovers configuration and policy and assembles the scan
+// options. When warnMissingPolicy is set, a missing policy file is reported to
+// stderr (a scan proceeds with an empty rule set regardless).
+func buildScanOptions(root, configPath, policyPath, repo, ref, rawDiff string, warnMissingPolicy bool) (scan.Options, error) {
+	cfg, _, err := loadConfig(root, configPath)
+	if err != nil {
+		return scan.Options{}, err
+	}
+	policyConfig, _, policyFound, err := loadPolicy(root, policyPath, cfg)
+	if err != nil {
+		return scan.Options{}, err
+	}
+	if !policyFound && warnMissingPolicy {
+		fmt.Fprintln(os.Stderr, "merger: no policy file found — scanning with an empty rule set")
+	}
+
+	return scan.Options{
+		Diff:     rawDiff,
+		RepoRoot: root,
+		Repo:     repoRef(repo),
+		Ref:      ref,
+		Policy:   policyConfig,
+		Lanes: lanes.Config{
+			GreenMax:  cfg.Lanes.GreenMax,
+			YellowMax: cfg.Lanes.YellowMax,
+			RedMax:    cfg.Lanes.RedMax,
+		},
+		EnableCodeOwners: cfg.RuntimeGraph.EnableCodeOwners,
+	}, nil
+}
+
+func parseFailLane(raw string) (domain.MergeLane, error) {
+	if raw == "" {
+		return "", nil
+	}
+	lane := domain.MergeLane(strings.ToUpper(raw))
+	if _, ok := laneRank[lane]; !ok {
+		return "", fmt.Errorf("invalid -fail-on-lane %q (want GREEN, YELLOW, RED, or BLACK)", raw)
+	}
+	return lane, nil
+}
+
+func repoRef(raw string) domain.RepoRef {
+	if raw == "" {
+		return domain.RepoRef{}
+	}
+	owner, name, found := strings.Cut(raw, "/")
+	if !found {
+		return domain.RepoRef{Name: raw, FullName: raw}
+	}
+	return domain.RepoRef{Owner: owner, Name: name, FullName: raw}
+}
+
+func readDiff(root, diffPath, baseRef string) (string, error) {
+	switch {
+	case diffPath == "-":
+		data, err := io.ReadAll(os.Stdin)
+		if err != nil {
+			return "", fmt.Errorf("read diff from stdin: %w", err)
+		}
+		return string(data), nil
+	case diffPath != "":
+		data, err := os.ReadFile(diffPath)
+		if err != nil {
+			return "", fmt.Errorf("read diff file: %w", err)
+		}
+		return string(data), nil
+	case baseRef != "":
+		cmd := exec.Command("git", "-C", root, "diff", "--no-color", baseRef+"...HEAD")
+		out, err := cmd.Output()
+		if err != nil {
+			return "", fmt.Errorf("git diff %s...HEAD: %w", baseRef, err)
+		}
+		return string(out), nil
+	default:
+		return "", ExitError{Code: 2, Message: "provide a diff with -diff <file|-> or a range with -base-ref <ref>"}
+	}
+}
+
+func writeJSON(w io.Writer, payload any) error {
+	enc := json.NewEncoder(w)
+	enc.SetIndent("", "  ")
+	if err := enc.Encode(payload); err != nil {
+		return fmt.Errorf("encode json: %w", err)
+	}
+	return nil
+}
+
+func writeTextReport(w io.Writer, packet *domain.ChangePacket) {
+	repo := packet.Repo.FullName
+	if repo == "" {
+		repo = "-"
+	}
+	fmt.Fprintf(w, "merger scan\n")
+	fmt.Fprintf(w, "repo:       %s\n", repo)
+	fmt.Fprintf(w, "files:      %d changed\n", len(packet.Files))
+
+	fmt.Fprintf(w, "mutations:  %d\n", len(packet.Mutations))
+	for _, mutation := range packet.Mutations {
+		fmt.Fprintf(w, "  - [%s] %s: %s (%s)\n", mutation.Severity, mutation.Kind, mutation.Title, mutation.Detector)
+	}
+
+	fmt.Fprintf(w, "risk:       score %d (%s)\n", packet.RiskSummary.Score, packet.RiskSummary.Severity)
+	fmt.Fprintf(w, "runtime:    blast radius %s, criticality %s\n", packet.Runtime.BlastRadius, packet.Runtime.Criticality)
+	fmt.Fprintf(w, "decision:   %s\n", packet.Decision.Status)
+
+	if len(packet.Reviewers) > 0 {
+		labels := make([]string, 0, len(packet.Reviewers))
+		for _, reviewer := range packet.Reviewers {
+			label := reviewer.Team
+			if reviewer.Mandatory {
+				label += " (mandatory)"
+			}
+			labels = append(labels, label)
+		}
+		fmt.Fprintf(w, "reviewers:  %s\n", strings.Join(labels, ", "))
+	}
+
+	if len(packet.Evidence) > 0 {
+		labels := make([]string, 0, len(packet.Evidence))
+		for _, evidence := range packet.Evidence {
+			label := string(evidence.Type)
+			if evidence.Required {
+				label += " (required)"
+			}
+			labels = append(labels, label)
+		}
+		fmt.Fprintf(w, "evidence:   %s\n", strings.Join(labels, ", "))
+	}
+
+	deployment := string(packet.Deployment.Strategy)
+	if packet.Deployment.RequiresCanary {
+		deployment += " (canary required)"
+	}
+	fmt.Fprintf(w, "deployment: %s\n", deployment)
+	fmt.Fprintf(w, "merge lane: %s\n", packet.MergeLane)
+}
