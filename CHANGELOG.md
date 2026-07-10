@@ -31,6 +31,8 @@
   runs `merger scan` with an optional `fail-on-lane` gate
 * wire Homebrew distribution: `sync-homebrew-formula` in the release workflow
   and `homebrew-validation.yml` for PR validation
+* dogfood the sibling tool `codeguard` as a CI quality/security gate
+  (`.codeguard/codeguard.yaml` + baseline), running in `diff` mode on PRs
 * adopt the devr-tools tool-family conventions: Apache-2.0 `LICENSE`,
   `internal/version` package, `.golangci.yml` lint config, `SECURITY.md`,
   `CONTRIBUTING.md`, and this changelog

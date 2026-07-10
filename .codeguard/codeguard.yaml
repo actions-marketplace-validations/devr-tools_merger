@@ -1,0 +1,66 @@
+name: merger
+profile: startup
+targets:
+  - name: repository
+    path: ..
+    language: go
+    entrypoints:
+      - cmd/merger
+      - cmd/merger-ingest
+      - cmd/merger-controlplane
+checks:
+  quality: true
+  design: false
+  security: true
+  prompts: false
+  ci: true
+  quality_rules:
+    max_file_lines: 500
+    max_function_lines: 120
+    max_parameters: 12
+    max_cyclomatic_complexity: 15
+  ci_rules:
+    require_workflow_dir: true
+    required_workflow_files:
+      - .github/workflows/ci.yml
+      - .github/workflows/cd.yml
+      - .github/workflows/release.yml
+    required_release_files:
+      - .goreleaser.yaml
+      - Dockerfile.release
+      - .github/release-please-config.json
+      - .release-please-manifest.json
+      - CHANGELOG.md
+    required_automation_paths:
+      - Makefile
+      - scripts/commit.sh
+  security_rules:
+    # merger runs govulncheck in its own dedicated CI `security` job
+    # (make security). Disable codeguard's duplicate invocation here.
+    govulncheck_mode: off
+exclude:
+  - vendor/**
+  - "**/testdata/**"
+  - dist/**
+  - .gocache/**
+  - .build/**
+  # Generated code is not hand-maintained and should not be linted.
+  - "**/*.pb.go"
+  - "**/*_grpc.pb.go"
+waivers:
+  - rule: security.shell-execution
+    path: internal/cli/scan.go
+    reason: >-
+      `merger scan -base-ref` shells out to `git diff` with a fixed argv and no
+      shell interpolation to obtain the diff to analyze. The invocation is
+      constrained and reviewed.
+baseline:
+  # Pre-existing findings captured at codeguard adoption. Paths resolve inside
+  # the config directory, so this is .codeguard/baseline.json. Regenerate with
+  # `codeguard baseline -config .codeguard -output .codeguard/baseline.json`.
+  path: baseline.json
+cache:
+  enabled: true
+  path: cache.json
+output:
+  format: text
