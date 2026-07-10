@@ -4,7 +4,10 @@ set -euo pipefail
 base_ref="${1:-origin/main}"
 changed_files="$(git diff --name-only "${base_ref}"...HEAD)"
 
-code_changes="$(printf '%s\n' "$changed_files" | grep -E '^(cmd/|internal/|pkg/).+\.go$' | grep -Ev '(^|/).+_test\.go$|(^|/)doc\.go$' || true)"
+# internal/version/version.go is exempt: Release Please bumps its `var Number`
+# via the x-release-please-version marker, so release PRs change it with no
+# accompanying code to test. It holds only the version string.
+code_changes="$(printf '%s\n' "$changed_files" | grep -E '^(cmd/|internal/|pkg/).+\.go$' | grep -Ev '(^|/).+_test\.go$|(^|/)doc\.go$|^internal/version/version\.go$' || true)"
 test_changes="$(printf '%s\n' "$changed_files" | grep -E '(^tests/|_test\.go$)' || true)"
 
 if [ -z "$code_changes" ]; then
